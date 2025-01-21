@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
+import io.xconn.securehome.activities.RecognitionActivity;
+import io.xconn.securehome.activities.RegisterActivity;
 
 
 public class MainActivity extends AppCompatActivity {

@@ -38,4 +38,15 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+
+    implementation libs.retrofit
+    implementation libs.converter.gson
+    implementation libs.okhttp
+    implementation libs.converter.scalars
+    implementation libs.converter.moshi
+    implementation libs.okhttp.v4xx  // replace with the latest version
+    implementation libs.logging.interceptor  // add this for logging
+    implementation libs.logging.interceptor.v493  // Use the latest version
+
+
 }
