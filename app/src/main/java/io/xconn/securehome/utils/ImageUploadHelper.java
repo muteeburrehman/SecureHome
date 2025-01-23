@@ -58,7 +58,7 @@ public class ImageUploadHelper {
 
             RetrofitClient.getInstance()
                     .getApi()
-                    .upload(imagePart)
+                    .uploadImage(imagePart)
                     .enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {

@@ -10,9 +10,7 @@ import io.xconn.securehome.api.response.RecognitionResponse;
 public interface ApiService {
     @Multipart
     @POST("upload/")
-    Call<Void> upload(@Part MultipartBody.Part image);
-
-
+    Call<Void> uploadImage(@Part MultipartBody.Part image);
 
     @Multipart
     @POST("recognize/")
