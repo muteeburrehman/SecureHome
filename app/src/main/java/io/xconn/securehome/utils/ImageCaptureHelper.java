@@ -1,4 +1,3 @@
-// ImageCaptureHelper.java
 package io.xconn.securehome.utils;
 
 import android.Manifest;
@@ -25,7 +24,9 @@ import androidx.exifinterface.media.ExifInterface;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class ImageCaptureHelper {
@@ -39,7 +40,7 @@ public class ImageCaptureHelper {
     private ImageCaptureCallback callback;
 
     public interface ImageCaptureCallback {
-        void onImageCaptured(Uri imageUri);
+        void onImagesCaptured(List<Uri> imageUris);
     }
 
     public ImageCaptureHelper(AppCompatActivity activity, ImageView imageView) {
@@ -55,12 +56,27 @@ public class ImageCaptureHelper {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        imageUri = result.getData().getData();
-                        if (imageView != null) {
-                            imageView.setImageURI(imageUri);
+                        List<Uri> selectedImages = new ArrayList<>();
+
+                        if (result.getData().getClipData() != null) {
+                            // Multiple images selected
+                            int count = result.getData().getClipData().getItemCount();
+                            for (int i = 0; i < count; i++) {
+                                Uri imageUri = result.getData().getClipData().getItemAt(i).getUri();
+                                selectedImages.add(imageUri);
+                            }
+                        } else if (result.getData().getData() != null) {
+                            // Single image selected
+                            selectedImages.add(result.getData().getData());
                         }
-                        if (callback != null) {
-                            callback.onImageCaptured(imageUri);
+
+                        if (!selectedImages.isEmpty()) {
+                            if (callback != null) {
+                                callback.onImagesCaptured(selectedImages);
+                            }
+                            if (imageView != null && !selectedImages.isEmpty()) {
+                                imageView.setImageURI(selectedImages.get(0));
+                            }
                         }
                     }
                 });
@@ -74,7 +90,9 @@ public class ImageCaptureHelper {
                                 processAndDisplayCapturedImage();
                             }
                             if (callback != null) {
-                                callback.onImageCaptured(imageUri);
+                                List<Uri> capturedImages = new ArrayList<>();
+                                capturedImages.add(imageUri);
+                                callback.onImagesCaptured(capturedImages);
                             }
                         } catch (IOException e) {
                             showToast("Error processing camera image");
@@ -99,8 +117,10 @@ public class ImageCaptureHelper {
     }
 
     public void openGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        galleryActivityResultLauncher.launch(galleryIntent);
+        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        galleryIntent.setType("image/*");
+        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        galleryActivityResultLauncher.launch(Intent.createChooser(galleryIntent, "Select Pictures"));
     }
 
     public void checkPermissionsAndOpenCamera() {

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,80 +7,137 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="80dp">
+        android:layout_marginBottom="80dp"
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
+            <!-- Progress Text -->
             <TextView
                 android:id="@+id/tv_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:textSize="16sp"
-                android:textAlignment="center"/>
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:background="@drawable/progress_text_background"/>
 
+            <!-- Selected Images RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_selected_images"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"/>
+                android:layout_marginTop="16dp"
+                android:background="@drawable/recycler_background"
+                android:padding="8dp"/>
 
-            <LinearLayout
+            <!-- Buttons Section -->
+            <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal"
-                android:gravity="center">
+                android:layout_marginTop="24dp"
+                android:columnCount="2"
+                android:rowCount="1"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_gallery"
-                    style="@style/Widget.MaterialComponents.CardView"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                <!-- Gallery Button -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_margin="8dp"
-                    app:cardCornerRadius="75dp">
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
 
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_gallery"
+                        style="@style/Widget.MaterialComponents.CardView"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        app:cardCornerRadius="60dp"
+                        android:elevation="12dp"
                         android:layout_gravity="center"
-                        app:srcCompat="@drawable/ic_baseline_image_24"/>
-                </com.google.android.material.card.MaterialCardView>
+                        android:backgroundTint="@color/primaryColor">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_camera"
-                    style="@style/Widget.MaterialComponents.CardView"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="center"
+                            app:srcCompat="@drawable/ic_baseline_image_24"
+                            app:tint="@android:color/white" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Choose from Gallery"
+                        android:textSize="16sp"
+                        android:textColor="@color/white"
+                        android:gravity="center"/>
+                </LinearLayout>
+
+                <!-- Camera Button -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_margin="8dp"
-                    app:cardCornerRadius="75dp">
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
 
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_camera"
+                        style="@style/Widget.MaterialComponents.CardView"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        app:cardCornerRadius="60dp"
+                        android:elevation="12dp"
                         android:layout_gravity="center"
-                        app:srcCompat="@drawable/ic_baseline_camera_24"/>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
+                        android:backgroundTint="@color/secondaryColor">
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_gravity="center"
+                            app:srcCompat="@drawable/ic_baseline_camera_24"
+                            app:tint="@android:color/white" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Take a Photo"
+                        android:textSize="16sp"
+                        android:textColor="@color/white"
+                        android:gravity="center"/>
+                </LinearLayout>
+            </GridLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Bottom App Bar -->
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"/>
 
+    <!-- Upload Button -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_upload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/primaryColor"
         android:text="Upload Photos"
         app:icon="@drawable/ic_upload"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

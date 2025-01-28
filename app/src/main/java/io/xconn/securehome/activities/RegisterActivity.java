@@ -60,9 +60,11 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
         imageCaptureHelper = new ImageCaptureHelper(
                 this,
                 null,
-                uri -> {
-                    if (uri != null) {
-                        selectedImagesAdapter.addImage(uri);
+                imageUris -> {
+                    if (imageUris != null && !imageUris.isEmpty()) {
+                        for (Uri uri : imageUris) {
+                            selectedImagesAdapter.addImage(uri);
+                        }
                         updateProgressText(selectedImagesAdapter.getItemCount());
                         uploadButton.setEnabled(selectedImagesAdapter.getItemCount() >= REQUIRED_PHOTO_COUNT);
                     }
