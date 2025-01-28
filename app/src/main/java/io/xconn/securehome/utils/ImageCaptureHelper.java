@@ -1,3 +1,4 @@
+// ImageCaptureHelper.java
 package io.xconn.securehome.utils;
 
 import android.Manifest;
@@ -35,18 +36,32 @@ public class ImageCaptureHelper {
     private final ActivityResultLauncher<Intent> galleryActivityResultLauncher;
     private final ActivityResultLauncher<Intent> cameraActivityResultLauncher;
     private final ActivityResultLauncher<String[]> permissionLauncher;
+    private ImageCaptureCallback callback;
+
+    public interface ImageCaptureCallback {
+        void onImageCaptured(Uri imageUri);
+    }
 
     public ImageCaptureHelper(AppCompatActivity activity, ImageView imageView) {
+        this(activity, imageView, null);
+    }
+
+    public ImageCaptureHelper(AppCompatActivity activity, ImageView imageView, ImageCaptureCallback callback) {
         this.activity = activity;
         this.imageView = imageView;
+        this.callback = callback;
 
-        // Initialize launchers
         galleryActivityResultLauncher = activity.registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                         imageUri = result.getData().getData();
-                        imageView.setImageURI(imageUri);
+                        if (imageView != null) {
+                            imageView.setImageURI(imageUri);
+                        }
+                        if (callback != null) {
+                            callback.onImageCaptured(imageUri);
+                        }
                     }
                 });
 
@@ -55,7 +70,12 @@ public class ImageCaptureHelper {
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         try {
-                            processAndDisplayCapturedImage();
+                            if (imageView != null) {
+                                processAndDisplayCapturedImage();
+                            }
+                            if (callback != null) {
+                                callback.onImageCaptured(imageUri);
+                            }
                         } catch (IOException e) {
                             showToast("Error processing camera image");
                         }
@@ -72,6 +92,10 @@ public class ImageCaptureHelper {
                         showToast("Permissions are required to use the camera");
                     }
                 });
+    }
+
+    public void setImageCaptureCallback(ImageCaptureCallback callback) {
+        this.callback = callback;
     }
 
     public void openGallery() {
@@ -130,6 +154,8 @@ public class ImageCaptureHelper {
     }
 
     private void processAndDisplayCapturedImage() throws IOException {
+        if (imageView == null) return;
+
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = calculateInSampleSize(bmOptions, imageView.getWidth(), imageView.getHeight());
@@ -196,5 +222,9 @@ public class ImageCaptureHelper {
 
     private void showToast(String message) {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public Uri handleActivityResult(int requestCode, int resultCode, Intent data) {
+        return imageUri;
     }
 }

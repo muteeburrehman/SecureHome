@@ -1,88 +1,171 @@
 package io.xconn.securehome.activities;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import io.xconn.securehome.R;
+import io.xconn.securehome.adapters.SelectedImagesAdapter;
 import io.xconn.securehome.utils.ImageCaptureHelper;
 import io.xconn.securehome.utils.ImageUploadHelper;
 
-public class RegisterActivity extends AppCompatActivity {
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class RegisterActivity extends AppCompatActivity implements SelectedImagesAdapter.OnImageRemoveListener {
+    private static final int REQUIRED_PHOTO_COUNT = 10;
+
     private ImageCaptureHelper imageCaptureHelper;
     private ImageUploadHelper imageUploadHelper;
-    private AlertDialog progressDialog;
+    private SelectedImagesAdapter selectedImagesAdapter;
+    private TextView progressText;
+    private ExtendedFloatingActionButton uploadButton;
+    private AlertDialog uploadDialog;
+    private LinearProgressIndicator uploadProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        ImageView imageView = findViewById(R.id.imageView2);
-        imageCaptureHelper = new ImageCaptureHelper(this, imageView);
+        initializeViews();
+        setupRecyclerView();
+        setupImageHelpers();
+        setupClickListeners();
+    }
+
+    private void initializeViews() {
+        progressText = findViewById(R.id.tv_progress);
+        uploadButton = findViewById(R.id.fab_upload);
+        uploadButton.setEnabled(false);
+        updateProgressText(0);
+    }
+
+    private void setupRecyclerView() {
+        RecyclerView recyclerView = findViewById(R.id.recycler_selected_images);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        selectedImagesAdapter = new SelectedImagesAdapter(this, this);
+        recyclerView.setAdapter(selectedImagesAdapter);
+    }
+
+    private void setupImageHelpers() {
+        imageCaptureHelper = new ImageCaptureHelper(
+                this,
+                null,
+                uri -> {
+                    if (uri != null) {
+                        selectedImagesAdapter.addImage(uri);
+                        updateProgressText(selectedImagesAdapter.getItemCount());
+                        uploadButton.setEnabled(selectedImagesAdapter.getItemCount() >= REQUIRED_PHOTO_COUNT);
+                    }
+                }
+        );
         imageUploadHelper = new ImageUploadHelper(this);
+    }
 
-        findViewById(R.id.gallerycard).setOnClickListener(v ->
-                imageCaptureHelper.openGallery()
-        );
+    private void setupClickListeners() {
+        findViewById(R.id.card_gallery).setOnClickListener(v -> imageCaptureHelper.openGallery());
+        findViewById(R.id.card_camera).setOnClickListener(v -> imageCaptureHelper.checkPermissionsAndOpenCamera());
+        uploadButton.setOnClickListener(v -> handleImageUpload());
+    }
 
-        findViewById(R.id.cameracard).setOnClickListener(v ->
-                imageCaptureHelper.checkPermissionsAndOpenCamera()
-        );
+    private void updateProgressText(int currentCount) {
+        progressText.setText(String.format(Locale.US, "Selected Photos: %d/%d", currentCount, REQUIRED_PHOTO_COUNT));
+    }
 
-        findViewById(R.id.uploadButton).setOnClickListener(v ->
-                handleImageUpload()
-        );
+    @Override
+    public void onImageRemove(int position) {
+        selectedImagesAdapter.removeImage(position);
+        updateProgressText(selectedImagesAdapter.getItemCount());
+        uploadButton.setEnabled(selectedImagesAdapter.getItemCount() >= REQUIRED_PHOTO_COUNT);
     }
 
     private void handleImageUpload() {
-        Uri imageUri = imageCaptureHelper.getImageUri();
-        String photoPath = imageCaptureHelper.getCurrentPhotoPath();
-
-        if (imageUri == null && photoPath == null) {
-            Toast.makeText(this, "Please select or capture an image first", Toast.LENGTH_SHORT).show();
+        if (selectedImagesAdapter.getItemCount() < REQUIRED_PHOTO_COUNT) {
             return;
         }
 
-        showProgressDialog(); // Show the progress dialog
+        showUploadDialog();
+        uploadImagesSequentially();
+    }
 
-        imageUploadHelper.uploadImage(imageUri, photoPath, new ImageUploadHelper.UploadCallback() {
+    private void showUploadDialog() {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_upload_progress, null);
+        uploadProgress = dialogView.findViewById(R.id.upload_progress);
+        uploadProgress.setMax(selectedImagesAdapter.getItemCount());
+
+        uploadDialog = new AlertDialog.Builder(this)
+                .setTitle("Uploading Photos")
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        uploadDialog.show();
+    }
+
+    private void uploadImagesSequentially() {
+        List<Uri> imageUris = selectedImagesAdapter.getImageUris();
+        AtomicInteger successCount = new AtomicInteger(0);
+        AtomicInteger currentIndex = new AtomicInteger(0);
+
+        uploadNextImage(imageUris, successCount, currentIndex);
+    }
+
+    private void uploadNextImage(List<Uri> imageUris, AtomicInteger successCount, AtomicInteger currentIndex) {
+        if (currentIndex.get() >= imageUris.size()) {
+            handleUploadCompletion(successCount.get());
+            return;
+        }
+
+        Uri imageUri = imageUris.get(currentIndex.get());
+        imageUploadHelper.uploadImage(imageUri, null, new ImageUploadHelper.UploadCallback() {
             @Override
             public void onSuccess(String message) {
-                dismissProgressDialog(); // Dismiss the progress dialog
-                Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
-                finish();
+                successCount.incrementAndGet();
+                uploadProgress.setProgress(currentIndex.get() + 1);
+                currentIndex.incrementAndGet();
+                uploadNextImage(imageUris, successCount, currentIndex);
             }
 
             @Override
             public void onError(String error) {
-                dismissProgressDialog(); // Dismiss the progress dialog
-                Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_LONG).show();
+                currentIndex.incrementAndGet();
+                uploadNextImage(imageUris, successCount, currentIndex);
             }
         });
     }
 
-    private void showProgressDialog() {
-        // Create a custom AlertDialog with a ProgressBar
-        ProgressBar progressBar = new ProgressBar(this);
-        progressBar.setIndeterminate(true);
+    private void handleUploadCompletion(int successCount) {
+        if (uploadDialog != null && uploadDialog.isShowing()) {
+            uploadDialog.dismiss();
+        }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setMessage("Uploading image...")
-                .setView(progressBar)
-                .setCancelable(false);
-
-        progressDialog = builder.create();
-        progressDialog.show();
+        String message = String.format(Locale.US, "Successfully uploaded %d/%d photos",
+                successCount, selectedImagesAdapter.getItemCount());
+        new AlertDialog.Builder(this)
+                .setTitle("Upload Complete")
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    if (successCount == selectedImagesAdapter.getItemCount()) {
+                        finish();
+                    }
+                })
+                .show();
     }
 
-    private void dismissProgressDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (uploadDialog != null && uploadDialog.isShowing()) {
+            uploadDialog.dismiss();
         }
     }
 }
