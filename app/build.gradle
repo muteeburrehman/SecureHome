@@ -48,5 +48,8 @@ dependencies {
     implementation libs.logging.interceptor  // add this for logging
     implementation libs.logging.interceptor.v493  // Use the latest version
 
+    implementation libs.glide
+    annotationProcessor libs.compiler
+
 
 }

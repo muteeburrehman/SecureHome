@@ -9,6 +9,11 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+
 import io.xconn.securehome.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +22,7 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
     private final List<Uri> imageUris;
     private final Context context;
     private final OnImageRemoveListener listener;
+    private final RequestOptions glideOptions;
 
     public interface OnImageRemoveListener {
         void onImageRemove(int position);
@@ -26,6 +32,14 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
         this.context = context;
         this.imageUris = new ArrayList<>();
         this.listener = listener;
+        setHasStableIds(true); // Enable stable IDs for better recycling
+
+        // Configure Glide options once for reuse
+        this.glideOptions = new RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+                .placeholder(R.drawable.baseline_image_24) // Add a placeholder drawable
+                .error(R.drawable.remove); // Add an error drawable
     }
 
     @NonNull
@@ -38,12 +52,29 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
         Uri imageUri = imageUris.get(position);
-        holder.imageView.setImageURI(imageUri);
+
+        // Clear any previous image loading request
+        Glide.with(context).clear(holder.imageView);
+
+        // Load new image with Glide
+        Glide.with(context)
+                .load(imageUri)
+                .apply(glideOptions)
+                .into(holder.imageView);
+
+        // Use view tags to prevent wrong clicks during recycling
+        holder.removeButton.setTag(position);
         holder.removeButton.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onImageRemove(position);
+            int pos = (int) v.getTag();
+            if (listener != null && pos >= 0 && pos < imageUris.size()) {
+                listener.onImageRemove(pos);
             }
         });
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
@@ -51,7 +82,7 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
         return imageUris.size();
     }
 
-    // New method to add multiple images
+    // Efficient batch addition of images
     public void addImages(List<Uri> uris) {
         if (uris != null && !uris.isEmpty()) {
             int startPosition = imageUris.size();
@@ -60,27 +91,38 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
         }
     }
 
+    // Efficient removal with proper position checking
     public void removeImage(int position) {
         if (position >= 0 && position < imageUris.size()) {
             imageUris.remove(position);
             notifyItemRemoved(position);
-            notifyItemRangeChanged(position, imageUris.size());
+            // Only notify about changed range if there are items after the removed position
+            if (position < imageUris.size()) {
+                notifyItemRangeChanged(position, imageUris.size() - position);
+            }
         }
     }
 
+    // Return a defensive copy of the list
     public List<Uri> getImageUris() {
         return new ArrayList<>(imageUris);
     }
 
-    // Make ImageViewHolder public to resolve the visibility issue
+    // Improved ViewHolder with field initialization
     public static class ImageViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        ImageView removeButton;
+        final ImageView imageView;
+        final ImageView removeButton;
 
         public ImageViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.selected_image);
             removeButton = itemView.findViewById(R.id.btn_remove_image);
+
+            // Pre-set layout parameters for better performance
+            itemView.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
         }
     }
 }
