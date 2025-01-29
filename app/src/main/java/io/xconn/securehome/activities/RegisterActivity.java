@@ -1,27 +1,32 @@
 package io.xconn.securehome.activities;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import io.xconn.securehome.R;
 import io.xconn.securehome.adapters.SelectedImagesAdapter;
 import io.xconn.securehome.utils.ImageCaptureHelper;
 import io.xconn.securehome.utils.ImageUploadHelper;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class RegisterActivity extends AppCompatActivity implements SelectedImagesAdapter.OnImageRemoveListener {
     private static final int REQUIRED_PHOTO_COUNT = 10;
+    private static final int MAX_PHOTO_COUNT = 20;
 
     private ImageCaptureHelper imageCaptureHelper;
     private ImageUploadHelper imageUploadHelper;
@@ -30,6 +35,7 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
     private ExtendedFloatingActionButton uploadButton;
     private AlertDialog uploadDialog;
     private LinearProgressIndicator uploadProgress;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +56,25 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
     }
 
     private void setupRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.recycler_selected_images);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        recyclerView = findViewById(R.id.recycler_selected_images);
+
+        // Set fixed size for better performance
+        recyclerView.setHasFixedSize(true);
+
+        // Increase view cache
+        recyclerView.setItemViewCacheSize(20);
+
+        // Configure layout manager with prefetch
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+        layoutManager.setItemPrefetchEnabled(true);
+        layoutManager.setInitialPrefetchItemCount(12);
+        recyclerView.setLayoutManager(layoutManager);
+
         selectedImagesAdapter = new SelectedImagesAdapter(this, this);
         recyclerView.setAdapter(selectedImagesAdapter);
+
+        // Disable nested scrolling on RecyclerView
+        recyclerView.setNestedScrollingEnabled(false);
     }
 
     private void setupImageHelpers() {
@@ -62,15 +83,44 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
                 null,
                 imageUris -> {
                     if (imageUris != null && !imageUris.isEmpty()) {
-                        for (Uri uri : imageUris) {
-                            selectedImagesAdapter.addImage(uri);
+                        int remainingSlots = MAX_PHOTO_COUNT - selectedImagesAdapter.getItemCount();
+
+                        // Batch add images instead of one by one
+                        List<Uri> urisToAdd = new ArrayList<>();
+                        for (int i = 0; i < Math.min(imageUris.size(), remainingSlots); i++) {
+                            urisToAdd.add(imageUris.get(i));
                         }
+
+                        // Add all images at once
+                        if (!urisToAdd.isEmpty()) {
+                            selectedImagesAdapter.addImages(urisToAdd);
+                            // Use post to smooth out the scroll
+                            recyclerView.post(() ->
+                                    recyclerView.scrollToPosition(selectedImagesAdapter.getItemCount() - 1)
+                            );
+                        }
+
+                        if (imageUris.size() > remainingSlots) {
+                            showMaxLimitWarning(imageUris.size() - remainingSlots);
+                        }
+
                         updateProgressText(selectedImagesAdapter.getItemCount());
-                        uploadButton.setEnabled(selectedImagesAdapter.getItemCount() >= REQUIRED_PHOTO_COUNT);
+                        updateUploadButtonState();
                     }
                 }
         );
         imageUploadHelper = new ImageUploadHelper(this);
+    }
+
+    private void showMaxLimitWarning(int skippedCount) {
+        new AlertDialog.Builder(this)
+                .setTitle("Maximum Limit Reached")
+                .setMessage(String.format(Locale.US,
+                        "Only added %d of your selected photos. Maximum limit is %d photos.",
+                        Math.min(skippedCount, MAX_PHOTO_COUNT),
+                        MAX_PHOTO_COUNT))
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     private void setupClickListeners() {
@@ -80,14 +130,33 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
     }
 
     private void updateProgressText(int currentCount) {
-        progressText.setText(String.format(Locale.US, "Selected Photos: %d/%d", currentCount, REQUIRED_PHOTO_COUNT));
+        String progressFormat;
+        if (currentCount < REQUIRED_PHOTO_COUNT) {
+            progressFormat = "Selected Photos: %d (Minimum %d required)";
+        } else {
+            progressFormat = "Selected Photos: %d (Ready to upload)";
+        }
+        progressText.setText(String.format(Locale.US, progressFormat, currentCount, REQUIRED_PHOTO_COUNT));
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void updateUploadButtonState() {
+        boolean isEnabled = selectedImagesAdapter.getItemCount() >= REQUIRED_PHOTO_COUNT;
+        uploadButton.setEnabled(isEnabled);
+
+        if (isEnabled) {
+            uploadButton.setText(String.format(Locale.US, "Upload %d Photos",
+                    selectedImagesAdapter.getItemCount()));
+        } else {
+            uploadButton.setText("Upload Photos");
+        }
     }
 
     @Override
     public void onImageRemove(int position) {
         selectedImagesAdapter.removeImage(position);
         updateProgressText(selectedImagesAdapter.getItemCount());
-        uploadButton.setEnabled(selectedImagesAdapter.getItemCount() >= REQUIRED_PHOTO_COUNT);
+        updateUploadButtonState();
     }
 
     private void handleImageUpload() {
@@ -102,7 +171,10 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
     private void showUploadDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_upload_progress, null);
         uploadProgress = dialogView.findViewById(R.id.upload_progress);
-        uploadProgress.setMax(selectedImagesAdapter.getItemCount());
+        TextView uploadCountText = dialogView.findViewById(R.id.upload_count);
+
+        int totalPhotos = selectedImagesAdapter.getItemCount();
+        uploadProgress.setMax(totalPhotos);
 
         uploadDialog = new AlertDialog.Builder(this)
                 .setTitle("Uploading Photos")
@@ -111,6 +183,8 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
                 .create();
 
         uploadDialog.show();
+
+        uploadCountText.setText(String.format(Locale.US, "Uploaded 0/%d photos", totalPhotos));
     }
 
     private void uploadImagesSequentially() {
@@ -133,6 +207,13 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
             public void onSuccess(String message) {
                 successCount.incrementAndGet();
                 uploadProgress.setProgress(currentIndex.get() + 1);
+
+                TextView uploadCountText = uploadDialog.findViewById(R.id.upload_count);
+                if (uploadCountText != null) {
+                    uploadCountText.setText(String.format(Locale.US, "Uploaded %d/%d photos",
+                            currentIndex.get() + 1, imageUris.size()));
+                }
+
                 currentIndex.incrementAndGet();
                 uploadNextImage(imageUris, successCount, currentIndex);
             }
@@ -150,8 +231,7 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
             uploadDialog.dismiss();
         }
 
-        String message = String.format(Locale.US, "Successfully uploaded %d/%d photos",
-                successCount, selectedImagesAdapter.getItemCount());
+        String message = String.format(Locale.US, "Successfully uploaded %d photos", successCount);
         new AlertDialog.Builder(this)
                 .setTitle("Upload Complete")
                 .setMessage(message)

@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import io.xconn.securehome.R;
 import java.util.ArrayList;
@@ -26,8 +28,9 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
         this.listener = listener;
     }
 
+    @NonNull
     @Override
-    public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_selected_image, parent, false);
         return new ImageViewHolder(view);
     }
@@ -48,9 +51,13 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
         return imageUris.size();
     }
 
-    public void addImage(Uri imageUri) {
-        imageUris.add(imageUri);
-        notifyItemInserted(imageUris.size() - 1);
+    // New method to add multiple images
+    public void addImages(List<Uri> uris) {
+        if (uris != null && !uris.isEmpty()) {
+            int startPosition = imageUris.size();
+            imageUris.addAll(uris);
+            notifyItemRangeInserted(startPosition, uris.size());
+        }
     }
 
     public void removeImage(int position) {
@@ -65,11 +72,12 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
         return new ArrayList<>(imageUris);
     }
 
-    static class ImageViewHolder extends RecyclerView.ViewHolder {
+    // Make ImageViewHolder public to resolve the visibility issue
+    public static class ImageViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         ImageView removeButton;
 
-        ImageViewHolder(View itemView) {
+        public ImageViewHolder(View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.selected_image);
             removeButton = itemView.findViewById(R.id.btn_remove_image);
