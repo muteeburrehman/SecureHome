@@ -2,11 +2,13 @@ package io.xconn.securehome.activities;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -64,19 +66,32 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
         // Increase view cache
         recyclerView.setItemViewCacheSize(20);
 
-        // Configure layout manager with prefetch
+        // Configure layout manager with spacing
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
         layoutManager.setItemPrefetchEnabled(true);
         layoutManager.setInitialPrefetchItemCount(12);
-        recyclerView.setLayoutManager(layoutManager);
 
+        // Add item decoration for grid spacing
+        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
+                                       @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                int spacing = getResources().getDimensionPixelSize(R.dimen.grid_spacing);
+
+                outRect.left = spacing;
+                outRect.right = spacing;
+                outRect.top = spacing;
+                outRect.bottom = spacing;
+            }
+        });
+
+        recyclerView.setLayoutManager(layoutManager);
         selectedImagesAdapter = new SelectedImagesAdapter(this, this);
         recyclerView.setAdapter(selectedImagesAdapter);
 
         // Disable nested scrolling on RecyclerView
         recyclerView.setNestedScrollingEnabled(false);
     }
-
     private void setupImageHelpers() {
         imageCaptureHelper = new ImageCaptureHelper(
                 this,
