@@ -51,5 +51,11 @@ dependencies {
     implementation libs.glide
     annotationProcessor libs.compiler
 
+    implementation libs.ssp.android
+    implementation libs.sdp.android
+
+
+
+
 
 }
