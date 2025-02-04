@@ -36,6 +36,8 @@
         <activity
             android:name=".activities.RecognitionActivity"
             android:exported="false" />
+        <activity android:name=".activities.RegistrationActivity" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"
