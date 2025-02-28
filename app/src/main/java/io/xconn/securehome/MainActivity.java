@@ -2,13 +2,13 @@ package io.xconn.securehome;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.view.Menu;
 import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+
 import io.xconn.securehome.activities.LoginActivity;
-import io.xconn.securehome.activities.RecognitionActivity;
-import io.xconn.securehome.activities.RegisterActivity;
+import io.xconn.securehome.maincontroller.DashboardFragment;
 import io.xconn.securehome.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,14 +26,17 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        Button registerBtn = findViewById(R.id.buttonregister);
-        Button recognizeBtn = findViewById(R.id.buttonrecognize);
+        // Load the DashboardFragment as the default view
+        if (savedInstanceState == null) {
+            loadDashboardFragment();
+        }
+    }
 
-        registerBtn.setOnClickListener(view -> startActivity(new Intent(
-                MainActivity.this, RegisterActivity.class)));
-
-        recognizeBtn.setOnClickListener(view -> startActivity(new Intent(
-                MainActivity.this, RecognitionActivity.class)));
+    private void loadDashboardFragment() {
+        DashboardFragment dashboardFragment = new DashboardFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, dashboardFragment);
+        transaction.commit();
     }
 
     @Override
