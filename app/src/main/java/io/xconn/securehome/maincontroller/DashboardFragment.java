@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import pl.droidsonroids.gif.GifImageView;
 
-import com.bumptech.glide.Glide;
+
 import com.google.android.material.card.MaterialCardView;
 
 import io.xconn.securehome.R;
@@ -176,22 +176,7 @@ public class DashboardFragment extends Fragment {
     /**
      * Set weather animation based on current conditions
      */
-    private void setWeatherAnimation(String condition) {
-        int resourceId;
-        switch (condition.toLowerCase()) {
-            case "home":
-                resourceId = R.raw.home_animation;
-                break;
-            case "electricity":
-                resourceId = R.raw.electricity_animation;
-                break;
-            case "sunny":
-            default:
-                resourceId = R.raw.splashscreen;
-                break;
-        }
-        Glide.with(this).load(resourceId).into(weatherAnimationView);
-    }
+
 
     /**
      * Update port state in database/IOT device
