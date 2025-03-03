@@ -129,9 +129,9 @@ public class DashboardFragment extends Fragment {
         updateFireGasStatus(false);
 
         // Set initial air monitoring values (normally would come from sensors or API)
-        tempTextView.setText("24°C");
-        humidityTextView.setText("42%");
-        aqiTextView.setText("AQI: 35 Good");
+        tempTextView.setText("Alerts");
+        humidityTextView.setText("FacesRegistered");
+        aqiTextView.setText("Energy Analytics");
 
 
 
@@ -167,8 +167,8 @@ public class DashboardFragment extends Fragment {
             homeFgStatusTextView.setText("DANGER: Fire or Gas detected!");
             homeFgStatusTextView.setTextColor(getResources().getColor(R.color.dangerColor));
         } else {
-            fgStatusImageView.setImageResource(R.mipmap.safe_status);
-            homeFgStatusTextView.setText("All systems normal. No fire or gas detected.");
+            fgStatusImageView.setImageResource(R.drawable.secure_home);
+            homeFgStatusTextView.setText("Shifting from traditional ways to advanced secure technologies.");
             homeFgStatusTextView.setTextColor(getResources().getColor(R.color.textColor));
         }
     }
@@ -196,7 +196,7 @@ public class DashboardFragment extends Fragment {
      */
     private void openFireGasDetailView() {
         // TODO: Navigate to detailed fire/gas view
-        Toast.makeText(getContext(), "Opening Fire-Gas detailed view", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Opening SecureHome detailed view", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -204,7 +204,7 @@ public class DashboardFragment extends Fragment {
      */
     private void openAirMonitoringDetailView() {
         // TODO: Navigate to detailed air monitoring view
-        Toast.makeText(getContext(), "Opening Air Monitoring detailed view", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Opening SecureHome Analytics detailed view", Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -107,7 +107,7 @@
                     android:fontFamily="@font/mazzardlbolditalic"
                     android:gravity="center"
                     android:showText="true"
-                    android:text="Air Monitoring"
+                    android:text="Secure Home Analytics"
                     android:textAlignment="center"
                     android:textColor="@color/textColor"
                     android:textSize="28sp"
@@ -141,11 +141,11 @@
                                 android:orientation="vertical">
 
                                 <ImageView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
+                                    android:layout_width="64dp"
+                                    android:layout_height="64dp"
                                     android:layout_gravity="center"
                                     android:layout_marginTop="18dp"
-                                    android:src="@mipmap/temperature" />
+                                    android:src="@drawable/alerts" />
 
                                 <TextView
                                     android:id="@+id/temp"
@@ -186,7 +186,7 @@
                                 <ImageView
                                     android:layout_width="64dp"
                                     android:layout_height="64dp"
-                                    android:src="@mipmap/humidity"
+                                    android:src="@drawable/logo"
                                     android:layout_gravity="center"
                                     android:layout_marginTop="18dp" />
 
@@ -231,7 +231,7 @@
                         <ImageView
                             android:layout_width="64dp"
                             android:layout_height="64dp"
-                            android:src="@mipmap/air"
+                            android:src="@drawable/electricity"
                             android:layout_gravity="center"
                             android:layout_marginTop="18dp" />
 
