@@ -21,7 +21,7 @@
     <color name="backgroundColor">#ffffff</color>
     <color name="textColor">#100E3B</color>
     <color name="strokecol">#d9d9d9</color>
-
+   <color name="dark_gray">#A9A9A9</color>
     <color name="buttonColor">#6200EE</color>
     <color name="dangerColor">#FF0000</color>
 </resources>

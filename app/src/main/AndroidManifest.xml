@@ -24,9 +24,11 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".activities.EnergyMonitoringActivity"
+            android:name=".activities.FaceRegister"
             android:exported="false" />
-        <!-- Activities -->
+        <activity
+            android:name=".activities.EnergyMonitoringActivity"
+            android:exported="false" /> <!-- Activities -->
         <activity
             android:name=".maincontroller.BottomNavBarActivity"
             android:exported="false" />

@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import io.xconn.securehome.R;
 import io.xconn.securehome.activities.EnergyMonitoringActivity;
+import io.xconn.securehome.activities.FaceRegister;
 import io.xconn.securehome.activities.RecognitionActivity;
 import io.xconn.securehome.activities.RegisterActivity;
 import io.xconn.securehome.activities.RegistrationActivity;
@@ -73,7 +74,7 @@ public class ActivitiesFragment extends Fragment {
         // Facial Recognition Registration card click
         facialRecognitionCard.setOnClickListener(v -> {
             // Launch Facial Recognition Registration activity
-            Intent registrationIntent = new Intent(getActivity(), RegisterActivity.class);
+            Intent registrationIntent = new Intent(getActivity(), FaceRegister.class);
             startActivity(registrationIntent);
         });
 
