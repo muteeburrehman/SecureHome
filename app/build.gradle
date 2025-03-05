@@ -44,9 +44,7 @@ dependencies {
     implementation libs.okhttp
     implementation libs.converter.scalars
     implementation libs.converter.moshi
-    implementation libs.okhttp.v4xx  // replace with the latest version
     implementation libs.logging.interceptor  // add this for logging
-    implementation libs.logging.interceptor.v493  // Use the latest version
 
     implementation libs.glide
     annotationProcessor libs.compiler
@@ -56,5 +54,7 @@ dependencies {
 
     implementation libs.lottie
     implementation libs.android.gif.drawable
+
+    implementation libs.mpandroidchart
 
 }
