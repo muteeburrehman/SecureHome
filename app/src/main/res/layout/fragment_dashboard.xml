@@ -126,9 +126,12 @@
                         android:layout_height="match_parent">
 
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/alertCard"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_margin="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
                             app:cardCornerRadius="16dp"
                             app:cardElevation="6dp"
                             app:strokeWidth="2dp"
@@ -167,11 +170,13 @@
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
-
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/logoCard"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
                             app:cardCornerRadius="16dp"
                             app:cardElevation="6dp"
                             app:strokeWidth="2dp"
@@ -208,15 +213,17 @@
                                     android:textSize="24sp"
                                     android:textStyle="bold" />
                             </LinearLayout>
-
                         </com.google.android.material.card.MaterialCardView>
                     </TableRow>
                 </TableLayout>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/electricityCard"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="6dp"
                     app:strokeWidth="2dp"
@@ -254,60 +261,6 @@
                             android:textStyle="bold" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_below="@id/airm"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:layout_marginTop="50dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="6dp"
-            app:strokeWidth="2dp"
-            app:strokeColor="@color/strokecol"
-            app:cardBackgroundColor="@color/backgroundColor1">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginBottom="5dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TableLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:stretchColumns="0">
-
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:layout_marginBottom="5dp"
-                            android:drawablePadding="5dp"
-                            android:fontFamily="@font/mazzardlbolditalic"
-                            android:gravity="center"
-                            android:showText="true"
-                            android:text="Electrical Ports"
-                            android:textAlignment="center"
-                            android:textColor="@color/textColor"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-
-                    </TableRow>
-                </TableLayout>
 
                 <TableLayout
                     android:layout_width="fill_parent"
