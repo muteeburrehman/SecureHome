@@ -18,4 +18,5 @@
     <string name="devices">Devices</string>
     <string name="activities">Activities</string>
     <string name="alerts">Alerts</string>
+    <string name="add_device">Add Device</string>
 </resources>

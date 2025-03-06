@@ -29,4 +29,14 @@
     <color name="primary_blue">#2196F3</color>
     <color name="dark_gray">#757575</color>
 
+    <color name="colorPrimary">#3F51B5</color> <!-- Indigo -->
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color> <!-- Pink -->
+
+    <!-- Switch colors -->
+    <color name="switch_thumb_on">#3F51B5</color>
+    <color name="switch_thumb_off">#FFFFFF</color>
+    <color name="switch_track_on">#8C9EFF</color>
+    <color name="switch_track_off">#BBBBBB</color>
+
 </resources>

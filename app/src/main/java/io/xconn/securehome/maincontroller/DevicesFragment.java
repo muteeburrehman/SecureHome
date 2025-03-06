@@ -1,66 +1,47 @@
 package io.xconn.securehome.maincontroller;
 
+import io.xconn.securehome.R;
+import io.xconn.securehome.adapters.DeviceAdapter;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import java.util.ArrayList;
+import java.util.List;
 
-import io.xconn.securehome.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link DevicesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class DevicesFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public DevicesFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DevicesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DevicesFragment newInstance(String param1, String param2) {
-        DevicesFragment fragment = new DevicesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private List<Device> deviceList = new ArrayList<>();
+    private DeviceAdapter deviceAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_devices, container, false);
+        View view = inflater.inflate(R.layout.fragment_devices, container, false);
+
+        // Initialize RecyclerView
+        RecyclerView deviceRecyclerView = view.findViewById(R.id.deviceRecyclerView);
+        deviceRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        deviceAdapter = new DeviceAdapter(deviceList, requireContext());
+        deviceRecyclerView.setAdapter(deviceAdapter);
+
+        // Initialize FAB and set click listener
+        FloatingActionButton addDeviceFab = view.findViewById(R.id.addDeviceFab);
+        addDeviceFab.setOnClickListener(v -> addNewDevice());
+
+        return view;
+    }
+
+    private void addNewDevice() {
+        // Add a new device with default configurations
+        Device newDevice = new Device("Device " + (deviceList.size() + 1), false);
+        deviceList.add(newDevice);
+        deviceAdapter.notifyItemInserted(deviceList.size() - 1);
     }
 }
