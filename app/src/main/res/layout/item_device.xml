@@ -43,6 +43,15 @@
                 android:layout_marginStart="12dp"
                 android:layout_gravity="center_vertical" />
 
+            <ImageView
+                android:id="@+id/connectionStatus"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_wifi"
+                android:layout_marginEnd="8dp"
+                app:tint="#FFFFFF"
+                android:layout_gravity="center_vertical" />
+
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/deviceSwitch"
                 android:layout_width="wrap_content"
@@ -54,6 +63,7 @@
 
         <!-- Content Section -->
         <LinearLayout
+            android:id="@+id/deviceDetailsSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -69,101 +79,165 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_status"
-                    />
+                    android:src="@drawable/ic_status" />
 
                 <TextView
                     android:id="@+id/deviceStatus"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Status: Off"
                     android:textSize="16sp"
                     android:textColor="#555555"
                     android:layout_marginStart="8dp" />
+
+                <TextView
+                    android:id="@+id/deviceIpAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="192.168.1.100"
+                    android:textSize="14sp"
+                    android:textColor="#757575" />
             </LinearLayout>
 
-            <!-- Schedule Section Title -->
-            <TextView
+            <!-- Schedule Section Title with Expand/Collapse -->
+            <LinearLayout
+                android:id="@+id/scheduleHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="SCHEDULE"
-                android:textSize="14sp"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold"
+                android:orientation="horizontal"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="12dp">
 
-            <!-- Start Time Row -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="SCHEDULE"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/expandCollapseIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_expand"
+                    app:tint="@color/colorPrimary" />
+            </LinearLayout>
+
+            <!-- Schedule Content (Expandable) -->
+            <LinearLayout
+                android:id="@+id/scheduleContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Start Time Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_time" />
+
+                    <TextView
+                        android:id="@+id/startTimeText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Start: Not set"
+                        android:textSize="16sp"
+                        android:layout_marginStart="8dp"
+                        android:layout_gravity="center_vertical" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/setStartTimeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Set"
+                        android:textSize="12sp"
+                        app:cornerRadius="20dp"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        app:icon="@drawable/ic_clock"
+                        app:iconSize="16dp"
+                        app:iconTint="@color/colorPrimary"
+                        android:textColor="@color/colorPrimary" />
+                </LinearLayout>
+
+                <!-- End Time Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_time" />
+
+                    <TextView
+                        android:id="@+id/endTimeText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="End: Not set"
+                        android:textSize="16sp"
+                        android:layout_marginStart="8dp"
+                        android:layout_gravity="center_vertical" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/setEndTimeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Set"
+                        android:textSize="12sp"
+                        app:cornerRadius="20dp"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        app:icon="@drawable/ic_clock"
+                        app:iconSize="16dp"
+                        app:iconTint="@color/colorPrimary"
+                        android:textColor="@color/colorPrimary" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Bottom Action Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
+                android:layout_marginTop="16dp">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_time"
-                     />
-
-                <TextView
-                    android:id="@+id/startTimeText"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/editDeviceButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Start: Not set"
-                    android:textSize="16sp"
-                    android:layout_marginStart="8dp"
-                    android:layout_gravity="center_vertical" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/setStartTimeButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Set"
+                    android:text="Edit"
                     android:textSize="12sp"
-                    app:cornerRadius="20dp"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                    app:icon="@drawable/ic_clock"
+                    app:icon="@drawable/ic_edit"
                     app:iconSize="16dp"
                     app:iconTint="@color/colorPrimary"
                     android:textColor="@color/colorPrimary" />
-            </LinearLayout>
 
-            <!-- End Time Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_time"
-                     />
-
-                <TextView
-                    android:id="@+id/endTimeText"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/removeDeviceButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="End: Not set"
-                    android:textSize="16sp"
-                    android:layout_marginStart="8dp"
-                    android:layout_gravity="center_vertical" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/setEndTimeButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Set"
+                    android:text="Remove"
                     android:textSize="12sp"
-                    app:cornerRadius="20dp"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
-                    app:icon="@drawable/ic_clock"
+                    app:icon="@drawable/ic_delete"
                     app:iconSize="16dp"
-                    app:iconTint="@color/colorPrimary"
-                    android:textColor="@color/colorPrimary" />
+                    app:iconTint="#D32F2F"
+                    android:textColor="#D32F2F" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

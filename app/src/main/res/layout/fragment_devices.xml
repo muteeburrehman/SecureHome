@@ -7,32 +7,6 @@
     android:background="@color/backgroundColor"
     tools:context=".maincontroller.DevicesFragment">
 
-    <!-- Top App Bar -->
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="My Smart Devices"
-            app:titleTextColor="#FFFFFF"
-            app:menu="@menu/devices_menu"
-            app:navigationIcon="@drawable/ic_menu">
-
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/searchView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                app:queryHint="Search devices..."
-                app:iconifiedByDefault="true"
-                android:layout_marginEnd="8dp" />
-
-        </com.google.android.material.appbar.MaterialToolbar>
-    </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Main Content -->
     <androidx.constraintlayout.widget.ConstraintLayout
