@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -34,7 +33,7 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
     private DashboardFragment dashboardFragment;
     private DevicesFragment devicesFragment;
     private ActivitiesFragment activitiesFragment;
-    private AlertsFragment alertsFragment;
+    private Esp32CamFragment esp32CamFragment;
     private Fragment activeFragment;
     private FragmentManager fragmentManager;
 
@@ -70,7 +69,7 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
         dashboardFragment = new DashboardFragment();
         devicesFragment = new DevicesFragment();
         activitiesFragment = new ActivitiesFragment();
-        alertsFragment = new AlertsFragment();
+        esp32CamFragment = new Esp32CamFragment();
 
         // Restore Fragment on Configuration Change
         if (savedInstanceState == null) {
@@ -79,7 +78,7 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
                     .add(R.id.fragment_container, dashboardFragment, "DASHBOARD")
                     .add(R.id.fragment_container, devicesFragment, "DEVICES").hide(devicesFragment)
                     .add(R.id.fragment_container, activitiesFragment, "ACTIVITIES").hide(activitiesFragment)
-                    .add(R.id.fragment_container, alertsFragment, "ALERTS").hide(alertsFragment)
+                    .add(R.id.fragment_container, esp32CamFragment, "ALERTS").hide(esp32CamFragment)
                     .commit();
         } else {
             // Restore active fragment
@@ -100,8 +99,8 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
                 selectedFragment = activitiesFragment;
                 title = "ACTIVITIES";
             } else if (item.getItemId() == R.id.nav_alerts) {
-                selectedFragment = alertsFragment;
-                title = "ALERTS";
+                selectedFragment = esp32CamFragment;
+                title = "ESP CAM";
             }
 
             if (selectedFragment != null && selectedFragment != activeFragment) {

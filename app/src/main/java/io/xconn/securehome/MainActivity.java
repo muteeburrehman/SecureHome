@@ -15,9 +15,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import io.xconn.securehome.activities.LoginActivity;
 import io.xconn.securehome.maincontroller.ActivitiesFragment;
-import io.xconn.securehome.maincontroller.AlertsFragment;
 import io.xconn.securehome.maincontroller.DashboardFragment;
 import io.xconn.securehome.maincontroller.DevicesFragment;
+import io.xconn.securehome.maincontroller.Esp32CamFragment;
 import io.xconn.securehome.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -85,8 +85,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 selectedFragment = new ActivitiesFragment();
                 title = "ACTIVITIES";
             } else if (item.getItemId() == R.id.nav_alerts) {
-                selectedFragment = new AlertsFragment();
-                title = "ALERTS";
+                selectedFragment = new Esp32CamFragment();
+                title = "Esp32CAM";
             }
 
             if (selectedFragment != null) {

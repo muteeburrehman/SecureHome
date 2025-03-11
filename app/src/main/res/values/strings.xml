@@ -19,4 +19,13 @@
     <string name="activities">Activities</string>
     <string name="alerts">Alerts</string>
     <string name="add_device">Add Device</string>
+    <string name="camera">Camera</string>
+
+    <string name="connect">Connect</string>
+    <string name="capture">Capture</string>
+    <string name="settings">Settings</string>
+    <string name="cam1">Camera 1</string>
+    <string name="cam2">Camera 2</string>
+    <string name="camera_view">Camera View</string>
+    <string name="title_activity_settings">Settings</string>
 </resources>
