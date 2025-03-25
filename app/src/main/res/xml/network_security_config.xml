@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">192.168.0.208</domain>
+        <domain includeSubdomains="true">192.168.56.38</domain>
+        <domain includeSubdomains="true">192.168.211.238</domain>
+        <domain includeSubdomains="true">10.135.128.208</domain>
     </domain-config>
 </network-security-config>

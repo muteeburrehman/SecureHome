@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <!-- Required Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" /> <!-- Scoped Storage (Android 13+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
@@ -24,6 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SecureHome"
         android:usesCleartextTraffic="true"
+
         tools:targetApi="31">
         <activity
             android:name=".activities.SettingsActivity"

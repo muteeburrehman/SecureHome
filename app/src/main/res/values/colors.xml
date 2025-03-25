@@ -39,4 +39,6 @@
     <color name="switch_track_on">#8C9EFF</color>
     <color name="switch_track_off">#BBBBBB</color>
 
+    <color name="material_blue">#2196F3</color>
+
 </resources>
