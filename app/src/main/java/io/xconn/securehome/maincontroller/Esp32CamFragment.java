@@ -470,12 +470,11 @@ public class Esp32CamFragment extends Fragment {
                     connection.setDoInput(true);
                     connection.setRequestMethod("GET");
 
-                    // More comprehensive User-Agent
+                    // Comprehensive User-Agent and headers
                     connection.setRequestProperty("User-Agent",
                             "Mozilla/5.0 (Linux; Android) SecureHome Camera App");
-
-                    // Additional headers to improve compatibility
-                    connection.setRequestProperty("Accept", "image/jpeg,image/png,image/*;q=0.8,*/*;q=0.5");
+                    connection.setRequestProperty("Accept",
+                            "image/jpeg,image/png,image/*;q=0.8,*/*;q=0.5");
                     connection.setRequestProperty("Accept-Encoding", "identity");
                     connection.setInstanceFollowRedirects(true);
 
@@ -488,7 +487,6 @@ public class Esp32CamFragment extends Fragment {
                         String redirectUrl = connection.getHeaderField("Location");
                         if (redirectUrl != null) {
                             Log.d(TAG, "Redirected to: " + redirectUrl);
-                            // Optionally update the URL
                             url = new URL(redirectUrl);
                             connection = (HttpURLConnection) url.openConnection();
                             responseCode = connection.getResponseCode();
@@ -504,7 +502,7 @@ public class Esp32CamFragment extends Fragment {
                     String contentType = connection.getContentType();
                     Log.d(TAG, "Content Type: " + contentType);
 
-                    // More flexible content type checking
+                    // Flexible content type checking
                     if (contentType == null ||
                             (!contentType.contains("image") &&
                                     !contentType.contains("stream") &&
@@ -516,12 +514,13 @@ public class Esp32CamFragment extends Fragment {
 
                     InputStream inputStream = connection.getInputStream();
 
-                    // Hide progress indicator after first frame
-                    publishProgress(null);
+                    // Publish null to hide progress indicator
+                    publishProgress((Bitmap) null);
 
-                    byte[] buffer = new byte[4096];
+                    byte[] buffer = new byte[16384]; // Increased buffer size
                     ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
+                    int frameCount = 0;
                     while (!isCancelled()) {
                         try {
                             int bytesRead = inputStream.read(buffer);
@@ -533,16 +532,23 @@ public class Esp32CamFragment extends Fragment {
                             Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
                             if (bitmap != null) {
+                                // Publish bitmap to update UI
                                 publishProgress(bitmap);
+                                frameCount++;
 
                                 // Reset buffer
                                 byteBuffer.reset();
 
-                                // Slight delay to prevent overwhelming the UI
-                                TimeUnit.MILLISECONDS.sleep(100);
+                                // Slight delay to control frame rate
+                                TimeUnit.MILLISECONDS.sleep(50);
+
+                                // Optional: Break after certain number of frames to prevent infinite loop
+                                if (frameCount >= 1000) {
+                                    Log.d(TAG, "Reached maximum frame count");
+                                    break;
+                                }
                             } else {
                                 Log.w(TAG, "Decoded bitmap is null");
-                                break;
                             }
                         } catch (Exception e) {
                             Log.e(TAG, "Stream decoding error", e);
@@ -565,7 +571,6 @@ public class Esp32CamFragment extends Fragment {
                         connection.disconnect();
                     }
                 }
-
             } catch (Exception e) {
                 errorMessage = "Unexpected error: " + e.getMessage();
                 Log.e(TAG, errorMessage, e);
@@ -574,35 +579,83 @@ public class Esp32CamFragment extends Fragment {
         }
 
         @Override
+        protected void onProgressUpdate(Bitmap... values) {
+            // Hide progress indicator when first null is passed
+            if (values[0] == null) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        connectionProgress.setVisibility(View.GONE);
+                    });
+                }
+                return;
+            }
+
+            // Update ImageView on the main thread
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    try {
+                        cameraView.setImageBitmap(values[0]);
+                        cameraStatusText.setText("Live View - Connected");
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error updating UI", e);
+                    }
+                });
+            }
+        }
+
+        @Override
         protected void onPostExecute(Boolean success) {
             if (!success) {
-                // Provide more detailed error feedback
+                // Detailed error feedback
                 if (getActivity() != null) {
                     Toast.makeText(getActivity(),
                             "Connection failed: " + errorMessage,
                             Toast.LENGTH_LONG).show();
-                }
 
-                // Try next stream path
-                currentStreamPathIndex++;
-                attemptStreamConnection();
+                    // Try next stream path
+                    currentStreamPathIndex++;
+                    if (currentStreamPathIndex < POSSIBLE_STREAM_PATHS.length) {
+                        attemptStreamConnection();
+                    } else {
+                        // All paths exhausted
+                        Toast.makeText(getActivity(),
+                                "Could not connect to camera. Check URL and settings.",
+                                Toast.LENGTH_LONG).show();
+                        stopStreaming();
+                    }
+                }
             } else {
                 // Successfully connected
-                connectionProgress.setVisibility(View.GONE);
                 if (getActivity() != null) {
                     Toast.makeText(getActivity(),
                             "Connected to camera: " + attemptedUrl,
                             Toast.LENGTH_SHORT).show();
                 }
             }
+
+            // Network availability check
             if (!isNetworkAvailable()) {
                 diagnoseNetworkConnection();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            // Handle task cancellation
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    cameraStatusText.setText("Live View - Disconnected");
+                    connectionProgress.setVisibility(View.GONE);
+                });
             }
         }
     }
 
 
     private class CapturePhotoTask extends AsyncTask<String, Void, File> {
+        private static final int MAX_IMAGE_SIZE = 1024 * 1024; // 1MB max
+        private static final int BUFFER_SIZE = 8192; // 8KB buffer
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -619,42 +672,92 @@ public class Esp32CamFragment extends Fragment {
             try {
                 URL url = new URL(streamUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(10000);
+                connection.setReadTimeout(10000);
                 connection.setDoInput(true);
-                connection.connect();
 
+                // Use ByteArrayOutputStream for flexible buffering
+                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
                 InputStream inputStream = connection.getInputStream();
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
 
-                if (bitmap != null) {
-                    // Create directory if it doesn't exist
-                    File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_PICTURES), "SecureHome");
-                    if (!storageDir.exists()) {
-                        storageDir.mkdirs();
-                    }
+                byte[] buffer = new byte[BUFFER_SIZE];
+                int bytesRead;
+                int totalBytesRead = 0;
 
-                    // Create filename
-                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-                    photoFile = new File(storageDir, "ESP32CAM_" + timeStamp + ".jpg");
+                // Read image data with size protection
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    byteBuffer.write(buffer, 0, bytesRead);
+                    totalBytesRead += bytesRead;
 
-                    // Save the image
-                    FileOutputStream fos = new FileOutputStream(photoFile);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 95, fos);
-                    fos.close();
-
-                    // Make the photo available in the gallery
-                    if (getActivity() != null) {
-                        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                        mediaScanIntent.setData(android.net.Uri.fromFile(photoFile));
-                        getActivity().sendBroadcast(mediaScanIntent);
+                    // Prevent excessive memory usage
+                    if (totalBytesRead > MAX_IMAGE_SIZE) {
+                        Log.w(TAG, "Image too large, truncating to 1MB");
+                        break;
                     }
                 }
 
+                // Convert to byte array for more detailed processing
+                byte[] imageBytes = byteBuffer.toByteArray();
+
+                // Advanced bitmap decoding with detailed logging
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
+
+                // Detailed logging of image characteristics
+                Log.d(TAG, "Captured Image Details - " +
+                        "Width: " + options.outWidth +
+                        ", Height: " + options.outHeight +
+                        ", Size: " + imageBytes.length + " bytes");
+
+                // Only proceed if image has valid dimensions
+                if (options.outWidth > 0 && options.outHeight > 0) {
+                    options.inJustDecodeBounds = false;
+                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
+
+                    if (bitmap != null) {
+                        // Create SecureHome directory
+                        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                                Environment.DIRECTORY_PICTURES), "SecureHome");
+                        if (!storageDir.exists()) {
+                            storageDir.mkdirs();
+                        }
+
+                        // Create timestamped filename
+                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                                .format(new Date());
+                        photoFile = new File(storageDir, "ESP32CAM_" + timeStamp + ".jpg");
+
+                        // Adaptive compression based on image size
+                        int quality = imageBytes.length > 500 * 1024 ? 85 : 95;
+
+                        try (FileOutputStream fos = new FileOutputStream(photoFile)) {
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fos);
+                        }
+
+                        // Trigger media scanner
+                        if (getActivity() != null) {
+                            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                            mediaScanIntent.setData(android.net.Uri.fromFile(photoFile));
+                            getActivity().sendBroadcast(mediaScanIntent);
+                        }
+                    } else {
+                        Log.e(TAG, "Failed to decode bitmap: Null bitmap");
+                    }
+                } else {
+                    Log.e(TAG, "Invalid image dimensions");
+                }
+
+                // Close resources
                 inputStream.close();
+                byteBuffer.close();
                 connection.disconnect();
 
             } catch (IOException e) {
-                Log.e(TAG, "Error capturing photo: " + e.getMessage());
+                Log.e(TAG, "Error capturing photo: " + e.getMessage(), e);
                 return null;
             }
 
@@ -666,12 +769,14 @@ public class Esp32CamFragment extends Fragment {
             if (getActivity() == null) return;
 
             if (photoFile != null && photoFile.exists()) {
-                Toast.makeText(getActivity(), "Photo saved: " + photoFile.getName(),
+                Toast.makeText(getActivity(),
+                        "Photo saved: " + photoFile.getName(),
                         Toast.LENGTH_SHORT).show();
-                // Refresh the recent captures
                 loadRecentCaptures();
             } else {
-                Toast.makeText(getActivity(), "Failed to save photo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),
+                        "Failed to save photo. Check camera connection.",
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }
