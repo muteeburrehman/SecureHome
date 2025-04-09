@@ -470,28 +470,16 @@ public class Esp32CamFragment extends Fragment {
                     connection.setDoInput(true);
                     connection.setRequestMethod("GET");
 
-                    // Comprehensive User-Agent and headers
+                    // More comprehensive headers
                     connection.setRequestProperty("User-Agent",
                             "Mozilla/5.0 (Linux; Android) SecureHome Camera App");
                     connection.setRequestProperty("Accept",
                             "image/jpeg,image/png,image/*;q=0.8,*/*;q=0.5");
                     connection.setRequestProperty("Accept-Encoding", "identity");
-                    connection.setInstanceFollowRedirects(true);
+                    connection.setRequestProperty("Connection", "keep-alive");
 
                     int responseCode = connection.getResponseCode();
                     Log.d(TAG, "Connection URL: " + attemptedUrl + ", Response Code: " + responseCode);
-
-                    // Handle redirect responses
-                    if (responseCode == HttpURLConnection.HTTP_MOVED_PERM ||
-                            responseCode == HttpURLConnection.HTTP_MOVED_TEMP) {
-                        String redirectUrl = connection.getHeaderField("Location");
-                        if (redirectUrl != null) {
-                            Log.d(TAG, "Redirected to: " + redirectUrl);
-                            url = new URL(redirectUrl);
-                            connection = (HttpURLConnection) url.openConnection();
-                            responseCode = connection.getResponseCode();
-                        }
-                    }
 
                     if (responseCode != HttpURLConnection.HTTP_OK) {
                         errorMessage = "Server returned non-OK status: " + responseCode;
@@ -502,11 +490,10 @@ public class Esp32CamFragment extends Fragment {
                     String contentType = connection.getContentType();
                     Log.d(TAG, "Content Type: " + contentType);
 
-                    // Flexible content type checking
+                    // More flexible content type checking
                     if (contentType == null ||
-                            (!contentType.contains("image") &&
-                                    !contentType.contains("stream") &&
-                                    !contentType.contains("multipart"))) {
+                            (!contentType.toLowerCase().contains("image") &&
+                                    !contentType.toLowerCase().contains("jpeg"))) {
                         errorMessage = "Unexpected content type: " + contentType;
                         Log.w(TAG, errorMessage);
                         return false;
@@ -517,7 +504,8 @@ public class Esp32CamFragment extends Fragment {
                     // Publish null to hide progress indicator
                     publishProgress((Bitmap) null);
 
-                    byte[] buffer = new byte[16384]; // Increased buffer size
+                    // Increased buffer size for more robust streaming
+                    byte[] buffer = new byte[32768]; // 32KB buffer
                     ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
                     int frameCount = 0;
@@ -527,29 +515,44 @@ public class Esp32CamFragment extends Fragment {
                             if (bytesRead == -1) break;
 
                             byteBuffer.write(buffer, 0, bytesRead);
+
+                            // Attempt to decode only complete images
                             byte[] imageBytes = byteBuffer.toByteArray();
 
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                            // Advanced bitmap decoding with error handling
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inJustDecodeBounds = true;
+                            BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
 
-                            if (bitmap != null) {
-                                // Publish bitmap to update UI
-                                publishProgress(bitmap);
-                                frameCount++;
+                            // Only decode if we have a valid image
+                            if (options.outWidth > 0 && options.outHeight > 0) {
+                                options.inJustDecodeBounds = false;
+                                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-                                // Reset buffer
-                                byteBuffer.reset();
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
 
-                                // Slight delay to control frame rate
-                                TimeUnit.MILLISECONDS.sleep(50);
+                                if (bitmap != null) {
+                                    // Publish bitmap to update UI
+                                    publishProgress(bitmap);
+                                    frameCount++;
 
-                                // Optional: Break after certain number of frames to prevent infinite loop
-                                if (frameCount >= 1000) {
-                                    Log.d(TAG, "Reached maximum frame count");
-                                    break;
+                                    // Reset buffer after successful decode
+                                    byteBuffer.reset();
+
+                                    // Slight delay to control frame rate
+                                    TimeUnit.MILLISECONDS.sleep(50);
+
+                                    // Prevent infinite loop
+                                    if (frameCount >= 500) {
+                                        Log.d(TAG, "Reached maximum frame count");
+                                        break;
+                                    }
                                 }
-                            } else {
-                                Log.w(TAG, "Decoded bitmap is null");
                             }
+                        } catch (OutOfMemoryError oom) {
+                            Log.e(TAG, "Out of memory while decoding stream", oom);
+                            errorMessage = "Out of memory: " + oom.getMessage();
+                            break;
                         } catch (Exception e) {
                             Log.e(TAG, "Stream decoding error", e);
                             errorMessage = "Stream decoding failed: " + e.getMessage();
@@ -653,8 +656,8 @@ public class Esp32CamFragment extends Fragment {
 
 
     private class CapturePhotoTask extends AsyncTask<String, Void, File> {
-        private static final int MAX_IMAGE_SIZE = 1024 * 1024; // 1MB max
-        private static final int BUFFER_SIZE = 8192; // 8KB buffer
+        private static final int MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB max
+        private static final int BUFFER_SIZE = 16384; // 16KB buffer
 
         @Override
         protected void onPreExecute() {
@@ -672,96 +675,113 @@ public class Esp32CamFragment extends Fragment {
             try {
                 URL url = new URL(streamUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                // More comprehensive connection setup
                 connection.setRequestMethod("GET");
-                connection.setConnectTimeout(10000);
-                connection.setReadTimeout(10000);
+                connection.setConnectTimeout(15000);
+                connection.setReadTimeout(15000);
                 connection.setDoInput(true);
+                connection.setRequestProperty("User-Agent",
+                        "Mozilla/5.0 (Linux; Android) SecureHome Camera App");
+                connection.setRequestProperty("Accept", "image/jpeg");
 
-                // Use ByteArrayOutputStream for flexible buffering
-                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-                InputStream inputStream = connection.getInputStream();
-
-                byte[] buffer = new byte[BUFFER_SIZE];
-                int bytesRead;
-                int totalBytesRead = 0;
-
-                // Read image data with size protection
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    byteBuffer.write(buffer, 0, bytesRead);
-                    totalBytesRead += bytesRead;
-
-                    // Prevent excessive memory usage
-                    if (totalBytesRead > MAX_IMAGE_SIZE) {
-                        Log.w(TAG, "Image too large, truncating to 1MB");
-                        break;
-                    }
+                // Check response code explicitly
+                int responseCode = connection.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    Log.e(TAG, "HTTP error code: " + responseCode);
+                    return null;
                 }
 
-                // Convert to byte array for more detailed processing
-                byte[] imageBytes = byteBuffer.toByteArray();
+                // Verify content type
+                String contentType = connection.getContentType();
+                if (contentType == null || !contentType.toLowerCase().contains("image/jpeg")) {
+                    Log.e(TAG, "Unexpected content type: " + contentType);
+                    return null;
+                }
 
-                // Advanced bitmap decoding with detailed logging
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
+                // Enhanced image capture with multiple validation steps
+                try (InputStream inputStream = connection.getInputStream();
+                     ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream()) {
 
-                // Detailed logging of image characteristics
-                Log.d(TAG, "Captured Image Details - " +
-                        "Width: " + options.outWidth +
-                        ", Height: " + options.outHeight +
-                        ", Size: " + imageBytes.length + " bytes");
+                    byte[] buffer = new byte[BUFFER_SIZE];
+                    int bytesRead;
+                    int totalBytesRead = 0;
 
-                // Only proceed if image has valid dimensions
-                if (options.outWidth > 0 && options.outHeight > 0) {
+                    // Robust reading with size and integrity checks
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        byteBuffer.write(buffer, 0, bytesRead);
+                        totalBytesRead += bytesRead;
+
+                        // Prevent excessive memory usage
+                        if (totalBytesRead > MAX_IMAGE_SIZE) {
+                            Log.w(TAG, "Image too large, truncating to 2MB");
+                            break;
+                        }
+                    }
+
+                    byte[] imageBytes = byteBuffer.toByteArray();
+
+                    // Comprehensive image validation
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
+
+                    // Detailed logging and validation
+                    Log.d(TAG, "Captured Image Details - " +
+                            "Width: " + options.outWidth +
+                            ", Height: " + options.outHeight +
+                            ", Size: " + imageBytes.length + " bytes");
+
+                    // Strict dimension and size validation
+                    if (options.outWidth <= 0 || options.outHeight <= 0 ||
+                            imageBytes.length == 0 || imageBytes.length > MAX_IMAGE_SIZE) {
+                        Log.e(TAG, "Invalid image dimensions or size");
+                        return null;
+                    }
+
+                    // Decode bitmap with error handling
                     options.inJustDecodeBounds = false;
                     options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
                     Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
 
-                    if (bitmap != null) {
-                        // Create SecureHome directory
-                        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                                Environment.DIRECTORY_PICTURES), "SecureHome");
-                        if (!storageDir.exists()) {
-                            storageDir.mkdirs();
-                        }
-
-                        // Create timestamped filename
-                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-                                .format(new Date());
-                        photoFile = new File(storageDir, "ESP32CAM_" + timeStamp + ".jpg");
-
-                        // Adaptive compression based on image size
-                        int quality = imageBytes.length > 500 * 1024 ? 85 : 95;
-
-                        try (FileOutputStream fos = new FileOutputStream(photoFile)) {
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fos);
-                        }
-
-                        // Trigger media scanner
-                        if (getActivity() != null) {
-                            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                            mediaScanIntent.setData(android.net.Uri.fromFile(photoFile));
-                            getActivity().sendBroadcast(mediaScanIntent);
-                        }
-                    } else {
-                        Log.e(TAG, "Failed to decode bitmap: Null bitmap");
+                    if (bitmap == null) {
+                        Log.e(TAG, "Failed to decode bitmap");
+                        return null;
                     }
-                } else {
-                    Log.e(TAG, "Invalid image dimensions");
+
+                    // Create SecureHome directory
+                    File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES), "SecureHome");
+                    if (!storageDir.exists()) {
+                        storageDir.mkdirs();
+                    }
+
+                    // Create timestamped filename
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                            .format(new Date());
+                    photoFile = new File(storageDir, "ESP32CAM_" + timeStamp + ".jpg");
+
+                    // Adaptive compression
+                    int quality = imageBytes.length > 500 * 1024 ? 85 : 95;
+
+                    try (FileOutputStream fos = new FileOutputStream(photoFile)) {
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fos);
+                    }
+
+                    // Trigger media scanner
+                    if (getActivity() != null) {
+                        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                        mediaScanIntent.setData(android.net.Uri.fromFile(photoFile));
+                        getActivity().sendBroadcast(mediaScanIntent);
+                    }
+
+                    return photoFile;
                 }
-
-                // Close resources
-                inputStream.close();
-                byteBuffer.close();
-                connection.disconnect();
-
-            } catch (IOException e) {
-                Log.e(TAG, "Error capturing photo: " + e.getMessage(), e);
+            } catch (Exception e) {
+                Log.e(TAG, "Comprehensive capture error: " + e.getMessage(), e);
                 return null;
             }
-
-            return photoFile;
         }
 
         @Override

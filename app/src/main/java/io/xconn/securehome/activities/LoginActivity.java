@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         showLoading(true);
-        AuthManager.getInstance().login(email, password, new Callback<LoginResponse>() {
+        AuthManager.getInstance().login(LoginActivity.this, email, password, new Callback<LoginResponse>() {
             @Override
             public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
                 showLoading(false);

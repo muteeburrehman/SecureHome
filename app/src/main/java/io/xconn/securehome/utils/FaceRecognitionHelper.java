@@ -46,7 +46,7 @@ public class FaceRecognitionHelper {
                     requestFile
             );
 
-            RetrofitClient.getInstance()
+            RetrofitClient.getInstance(context)
                     .getApi()
                     .recognizeFace(imagePart)
                     .enqueue(new Callback<RecognitionResponse>() {

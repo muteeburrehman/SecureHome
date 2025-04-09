@@ -61,7 +61,7 @@ public class RegistrationActivity extends AppCompatActivity {
         }
 
         showLoading(true);
-        AuthManager.getInstance().register(fullName, email, phone, password, new Callback<RegisterResponse>() {
+        AuthManager.getInstance().register(RegistrationActivity.this, fullName, email, phone, password, new Callback<RegisterResponse>() {
             @Override
             public void onResponse(@NonNull Call<RegisterResponse> call, @NonNull Response<RegisterResponse> response) {
                 showLoading(false);

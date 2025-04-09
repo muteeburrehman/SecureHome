@@ -56,7 +56,7 @@ public class ImageUploadHelper {
                     requestFile
             );
 
-            RetrofitClient.getInstance()
+            RetrofitClient.getInstance(context)
                     .getApi()
                     .uploadImage(imagePart)
                     .enqueue(new Callback<Void>() {
