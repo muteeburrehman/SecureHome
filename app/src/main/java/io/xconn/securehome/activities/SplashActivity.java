@@ -25,8 +25,8 @@ public class SplashActivity extends AppCompatActivity {
 
             // First check if server is configured
             if (!ApiConfig.hasServerConfig(this)) {
-                // No server configuration yet, go to server config screen first
-                intent = new Intent(SplashActivity.this, ServerConfigActivity.class);
+                // No server configuration yet, go to server discovery screen
+                intent = new Intent(SplashActivity.this, ServerDiscoveryActivity.class);
             } else {
                 // Server is configured, check login state
                 SessionManager sessionManager = new SessionManager(this);

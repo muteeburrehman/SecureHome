@@ -44,7 +44,7 @@
 
         <!-- Server configuration activity -->
         <activity
-            android:name=".activities.ServerConfigActivity"
+            android:name=".activities.ServerDiscoveryActivity"
             android:exported="false" />
 
         <activity
