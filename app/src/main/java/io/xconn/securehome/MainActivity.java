@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import io.xconn.securehome.activities.LoginActivity;
+import io.xconn.securehome.api.FirebaseAuthManager;
 import io.xconn.securehome.maincontroller.ActivitiesFragment;
 import io.xconn.securehome.maincontroller.DashboardFragment;
 import io.xconn.securehome.maincontroller.DevicesFragment;
@@ -23,6 +24,7 @@ import io.xconn.securehome.utils.SessionManager;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private SessionManager sessionManager;
+    private FirebaseAuthManager authManager;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private BottomNavigationView bottomNavigationView;
@@ -33,9 +35,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize SessionManager and check login state
+        // Initialize managers
         sessionManager = new SessionManager(this);
-        if (!sessionManager.isLoggedIn()) {
+        authManager = FirebaseAuthManager.getInstance();
+
+        // Check login state using Firebase
+        if (!authManager.isUserLoggedIn()) {
             redirectToLogin();
             return;
         }
@@ -61,6 +66,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Update navigation header with user info if needed
+        if (authManager.getCurrentUser() != null) {
+            // If you have a header view with user info fields, you can update them here
+            // View headerView = navigationView.getHeaderView(0);
+            // TextView userNameView = headerView.findViewById(R.id.user_name);
+            // userNameView.setText(authManager.getCurrentUser().getDisplayName());
+        }
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
@@ -110,7 +123,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void logout() {
-        sessionManager.clearSession();
+        // Use SessionManager logout method that also signs out from Firebase
+        sessionManager.logout();
         redirectToLogin();
     }
 
@@ -140,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_settings) {
             // TODO: Navigate to settings
         } else if (id == R.id.nav_cp) {
-            // TODO: Navigate to change password
+            // TODO: Navigate to change password - could use Firebase password reset
         } else if (id == R.id.nav_faq) {
             // TODO: Open FAQ
         } else if (id == R.id.nav_reportbug) {

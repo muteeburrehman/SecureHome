@@ -68,24 +68,24 @@
             android:textColorHint="@color/textColor"
             android:textSize="20sp" />
 
-        <EditText
-            android:id="@+id/phone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:backgroundTint="@color/textColor"
-            android:drawableStart="@mipmap/phone"
-            android:drawablePadding="16dp"
-            android:hint="@string/mobile_number"
-            android:inputType="phone"
-            android:maxLength="30"
-            android:maxLines="1"
-            android:padding="16dp"
-            android:shadowColor="@color/textColor"
-            android:textColor="@color/textColor"
-            android:textColorHint="@color/textColor"
-            android:textSize="20sp" />
+<!--        <EditText-->
+<!--            android:id="@+id/phone"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginLeft="16dp"-->
+<!--            android:layout_marginRight="16dp"-->
+<!--            android:backgroundTint="@color/textColor"-->
+<!--            android:drawableStart="@mipmap/phone"-->
+<!--            android:drawablePadding="16dp"-->
+<!--            android:hint="@string/mobile_number"-->
+<!--            android:inputType="phone"-->
+<!--            android:maxLength="30"-->
+<!--            android:maxLines="1"-->
+<!--            android:padding="16dp"-->
+<!--            android:shadowColor="@color/textColor"-->
+<!--            android:textColor="@color/textColor"-->
+<!--            android:textColorHint="@color/textColor"-->
+<!--            android:textSize="20sp" />-->
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"

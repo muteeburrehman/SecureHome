@@ -10,17 +10,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import io.xconn.securehome.MainActivity;
 import io.xconn.securehome.R;
-import io.xconn.securehome.api.AuthManager;
-import io.xconn.securehome.api.response.LoginResponse;
+import io.xconn.securehome.api.FirebaseAuthManager;
 import io.xconn.securehome.utils.SessionManager;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText emailInput, passwordInput;
@@ -28,15 +23,20 @@ public class LoginActivity extends AppCompatActivity {
     private TextView registerLink;
     private ProgressBar progressBar;
     private SessionManager sessionManager;
+    private FirebaseAuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        authManager = FirebaseAuthManager.getInstance();
         sessionManager = new SessionManager(this);
-        if (sessionManager.isLoggedIn()) {
+
+        // If user is already logged in, go straight to main activity
+        if (authManager.isUserLoggedIn()) {
             navigateToMainActivity();
+            return;
         }
 
         initializeViews();
@@ -74,28 +74,20 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         showLoading(true);
-        AuthManager.getInstance().login(LoginActivity.this, email, password, new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
-                showLoading(false);
-                if (response.isSuccessful() && response.body() != null) {
-                    handleLoginSuccess(response.body(), email);
-                } else {
-                    Toast.makeText(LoginActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
-                showLoading(false);
-                Toast.makeText(LoginActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+        authManager.login(email, password, task -> {
+            showLoading(false);
+            if (task.isSuccessful()) {
+                handleLoginSuccess(email);
+            } else {
+                Toast.makeText(LoginActivity.this,
+                        "Authentication failed: " + task.getException().getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void handleLoginSuccess(LoginResponse loginResponse, String email) {
+    private void handleLoginSuccess(String email) {
         sessionManager.setLoggedIn(true);
-        sessionManager.saveAuthToken(loginResponse.getAccess_token());
         sessionManager.saveUserEmail(email);
         navigateToMainActivity();
     }
