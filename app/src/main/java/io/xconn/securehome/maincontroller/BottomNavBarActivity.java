@@ -18,6 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 import io.xconn.securehome.R;
+import io.xconn.securehome.activities.AddHomeFragment;
 import io.xconn.securehome.activities.LoginActivity;
 import io.xconn.securehome.utils.SessionManager;
 
@@ -31,7 +32,7 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
 
     // Fragments
     private DashboardFragment dashboardFragment;
-    private DevicesFragment devicesFragment;
+    private AddHomeFragment addHomeFragment;
     private ActivitiesFragment activitiesFragment;
     private Esp32CamFragment esp32CamFragment;
     private Fragment activeFragment;
@@ -67,7 +68,7 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
 
         // Initialize Fragments
         dashboardFragment = new DashboardFragment();
-        devicesFragment = new DevicesFragment();
+        addHomeFragment = new AddHomeFragment();
         activitiesFragment = new ActivitiesFragment();
         esp32CamFragment = new Esp32CamFragment();
 
@@ -76,7 +77,7 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
             activeFragment = dashboardFragment;
             fragmentManager.beginTransaction()
                     .add(R.id.fragment_container, dashboardFragment, "DASHBOARD")
-                    .add(R.id.fragment_container, devicesFragment, "DEVICES").hide(devicesFragment)
+                    .add(R.id.fragment_container, addHomeFragment, "Home").hide(addHomeFragment)
                     .add(R.id.fragment_container, activitiesFragment, "ACTIVITIES").hide(activitiesFragment)
                     .add(R.id.fragment_container, esp32CamFragment, "ALERTS").hide(esp32CamFragment)
                     .commit();
@@ -93,8 +94,8 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
                 selectedFragment = dashboardFragment;
                 title = "DASHBOARD";
             } else if (item.getItemId() == R.id.nav_devices) {
-                selectedFragment = devicesFragment;
-                title = "DEVICES";
+                selectedFragment = addHomeFragment;
+                title = "Home";
             } else if (item.getItemId() == R.id.nav_activities) {
                 selectedFragment = activitiesFragment;
                 title = "ACTIVITIES";

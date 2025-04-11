@@ -41,4 +41,7 @@
 
     <color name="material_blue">#2196F3</color>
 
+
+    <color name="chip_background_color">#ECEFF1</color>
+
 </resources>

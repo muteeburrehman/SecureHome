@@ -6,8 +6,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Scoped Storage (Android 13+) -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Scoped Storage (Android 13+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
@@ -30,7 +29,9 @@
         android:theme="@style/Theme.SecureHome"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
+        <activity
+            android:name=".activities.EnterHomeActivity"
+            android:exported="false" />
         <!-- Splash activity as launcher -->
         <activity
             android:name=".activities.SplashActivity"
@@ -38,15 +39,13 @@
             android:theme="@style/Theme.SecureHome">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Server configuration activity -->
+        </activity> <!-- Server configuration activity -->
         <activity
             android:name=".activities.ServerDiscoveryActivity"
             android:exported="false" />
-
         <activity
             android:name=".activities.SettingsActivity"
             android:exported="false" />
@@ -55,9 +54,7 @@
             android:exported="false" />
         <activity
             android:name=".activities.EnergyMonitoringActivity"
-            android:exported="false" />
-
-        <!-- Other activities -->
+            android:exported="false" /> <!-- Other activities -->
         <activity
             android:name=".maincontroller.BottomNavBarActivity"
             android:exported="false" />
@@ -72,9 +69,7 @@
             android:exported="false" />
         <activity
             android:name=".activities.RegistrationActivity"
-            android:exported="false" />
-
-        <!-- File Provider Configuration -->
+            android:exported="false" /> <!-- File Provider Configuration -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -83,12 +78,11 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider>
-
-        <!-- Main Activity (no longer launcher) -->
+        </provider> <!-- Main Activity (no longer launcher) -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
+
             <!-- Removed intent-filter to make it not a launcher activity -->
         </activity>
     </application>

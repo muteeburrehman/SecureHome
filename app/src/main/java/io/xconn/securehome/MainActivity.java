@@ -13,11 +13,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+
+import io.xconn.securehome.activities.AddHomeFragment;
 import io.xconn.securehome.activities.LoginActivity;
 import io.xconn.securehome.api.FirebaseAuthManager;
 import io.xconn.securehome.maincontroller.ActivitiesFragment;
 import io.xconn.securehome.maincontroller.DashboardFragment;
-import io.xconn.securehome.maincontroller.DevicesFragment;
 import io.xconn.securehome.maincontroller.Esp32CamFragment;
 import io.xconn.securehome.utils.SessionManager;
 
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 selectedFragment = new DashboardFragment();
                 title = "DASHBOARD";
             } else if (item.getItemId() == R.id.nav_devices) {
-                selectedFragment = new DevicesFragment();
+                selectedFragment = new AddHomeFragment();
                 title = "DEVICES";
             } else if (item.getItemId() == R.id.nav_activities) {
                 selectedFragment = new ActivitiesFragment();

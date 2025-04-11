@@ -1,49 +1,33 @@
+// app/src/main/java/io/xconn/securehome/models/Device.java
 package io.xconn.securehome.models;
 
-import androidx.annotation.DrawableRes;
-import io.xconn.securehome.R;
+import com.google.gson.annotations.SerializedName;
 
 public class Device {
-    // Device Info
-    private String id;
+    @SerializedName("id")
+    private int id;
+
+    @SerializedName("name")
     private String name;
-    private DeviceType type;
-    private boolean isOn;
 
-    // Connection Info
-    private String ipAddress;
-    private int port;
-    private String username;
-    private String password;
-    private boolean isConnected;
+    @SerializedName("status")
+    private boolean status;
 
-    // Schedule Info
-    private String startTime;
-    private String endTime;
+    @SerializedName("home_id")
+    private int homeId;
 
-    // Constructors
-    public Device(String name, DeviceType type) {
-        this.id = generateUniqueId();
+    public Device(String name, boolean status, int homeId) {
         this.name = name;
-        this.type = type;
-        this.isOn = false;
-        this.isConnected = false;
-        this.startTime = "Not set";
-        this.endTime = "Not set";
+        this.status = status;
+        this.homeId = homeId;
     }
 
-    public Device(String name, DeviceType type, String ipAddress, int port,
-                  String username, String password) {
-        this(name, type);
-        this.ipAddress = ipAddress;
-        this.port = port;
-        this.username = username;
-        this.password = password;
-    }
-
-    // Getters and Setters
-    public String getId() {
+    public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -54,131 +38,19 @@ public class Device {
         this.name = name;
     }
 
-    public DeviceType getType() {
-        return type;
+    public boolean isStatus() {
+        return status;
     }
 
-    public void setType(DeviceType type) {
-        this.type = type;
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
-    public boolean isOn() {
-        return isOn;
+    public int getHomeId() {
+        return homeId;
     }
 
-    public void setOn(boolean on) {
-        isOn = on;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public boolean isConnected() {
-        return isConnected;
-    }
-
-    public void setConnected(boolean connected) {
-        isConnected = connected;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-    // Helper methods
-    @DrawableRes
-    public int getIconResource() {
-        switch (type) {
-            case LIGHT:
-                return R.drawable.ic_lightbulb;
-            case OUTLET:
-                return R.drawable.ic_outlets;
-            case THERMOSTAT:
-                return R.drawable.ic_thermostat;
-            case CAMERA:
-                return R.drawable.ic_camera;
-            default:
-                return R.drawable.ic_home;
-        }
-    }
-
-    public String getStatusText() {
-        if (!isConnected) {
-            return "Disconnected";
-        }
-        return isOn ? "On" : "Off";
-    }
-
-    private String generateUniqueId() {
-        return "device_" + System.currentTimeMillis() + "_" + Math.random() * 1000;
-    }
-
-    // Device Type Enum
-    public enum DeviceType {
-        LIGHT("Light"),
-        OUTLET("Outlet"),
-        THERMOSTAT("Thermostat"),
-        CAMERA("Camera"),
-        OTHER("Other");
-
-        private final String displayName;
-
-        DeviceType(String displayName) {
-            this.displayName = displayName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        public static DeviceType fromDisplayName(String displayName) {
-            for (DeviceType type : values()) {
-                if (type.getDisplayName().equals(displayName)) {
-                    return type;
-                }
-            }
-            return OTHER;
-        }
+    public void setHomeId(int homeId) {
+        this.homeId = homeId;
     }
 }

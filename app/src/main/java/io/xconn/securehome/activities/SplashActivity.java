@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import io.xconn.securehome.MainActivity;
 import io.xconn.securehome.R;
-import io.xconn.securehome.network.ApiConfig;
 import io.xconn.securehome.utils.SessionManager;
 
 @SuppressLint("CustomSplashScreen")
@@ -22,21 +21,14 @@ public class SplashActivity extends AppCompatActivity {
 
         new Handler().postDelayed(() -> {
             Intent intent;
+            SessionManager sessionManager = new SessionManager(this);
 
-            // First check if server is configured
-            if (!ApiConfig.hasServerConfig(this)) {
-                // No server configuration yet, go to server discovery screen
-                intent = new Intent(SplashActivity.this, ServerDiscoveryActivity.class);
+            if (sessionManager.isLoggedIn()) {
+                // User is logged in, go to main activity
+                intent = new Intent(SplashActivity.this, MainActivity.class);
             } else {
-                // Server is configured, check login state
-                SessionManager sessionManager = new SessionManager(this);
-                if (sessionManager.isLoggedIn()) {
-                    // User is logged in, go to main activity
-                    intent = new Intent(SplashActivity.this, MainActivity.class);
-                } else {
-                    // User is not logged in, go to login screen
-                    intent = new Intent(SplashActivity.this, LoginActivity.class);
-                }
+                // User is not logged in, go to login screen
+                intent = new Intent(SplashActivity.this, LoginActivity.class);
             }
 
             startActivity(intent);
