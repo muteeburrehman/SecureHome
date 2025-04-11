@@ -25,6 +25,7 @@ import io.xconn.securehome.R;
 import io.xconn.securehome.adapters.SelectedImagesAdapter;
 import io.xconn.securehome.utils.ImageCaptureHelper;
 import io.xconn.securehome.utils.ImageUploadHelper;
+import io.xconn.securehome.utils.ServerCheckUtility;
 
 public class RegisterActivity extends AppCompatActivity implements SelectedImagesAdapter.OnImageRemoveListener {
     private static final int REQUIRED_PHOTO_COUNT = 10;
@@ -43,6 +44,12 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        // Check if server is configured first, before initializing anything else
+        if (!ServerCheckUtility.checkServerConfigured(this)) {
+            // Return early - the user will be redirected to ServerDiscoveryActivity
+            return;
+        }
 
         initializeViews();
         setupRecyclerView();
@@ -92,6 +99,8 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
         // Disable nested scrolling on RecyclerView
         recyclerView.setNestedScrollingEnabled(false);
     }
+
+    // Rest of the code remains unchanged
     private void setupImageHelpers() {
         imageCaptureHelper = new ImageCaptureHelper(
                 this,

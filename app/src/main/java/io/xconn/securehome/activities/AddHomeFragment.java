@@ -1,4 +1,3 @@
-// app/src/main/java/io/xconn/securehome/ui/home/AddHomeFragment.java
 package io.xconn.securehome.activities;
 
 import android.content.Intent;
@@ -19,6 +18,7 @@ import io.xconn.securehome.R;
 import io.xconn.securehome.models.Home;
 import io.xconn.securehome.repository.HomeRepository;
 import io.xconn.securehome.activities.DeviceListActivity;
+import io.xconn.securehome.utils.ServerCheckUtility;
 
 public class AddHomeFragment extends Fragment implements HomeRepository.OnHomeAddedListener {
     private EditText etOwner, etIpAddress, etPort;
@@ -26,11 +26,12 @@ public class AddHomeFragment extends Fragment implements HomeRepository.OnHomeAd
     private ProgressBar progressBar;
     private HomeRepository homeRepository;
     private View rootView;
+    private boolean isServerConfigured = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        homeRepository = new HomeRepository(requireContext());
+        // Do NOT initialize homeRepository here
     }
 
     @Nullable
@@ -44,6 +45,31 @@ public class AddHomeFragment extends Fragment implements HomeRepository.OnHomeAd
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Check if server is configured first
+        isServerConfigured = ServerCheckUtility.checkServerConfigured(this);
+
+        // Only continue initialization if server is configured
+        if (isServerConfigured) {
+            homeRepository = new HomeRepository(requireContext());
+            initializeComponents();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Check again when fragment resumes - this handles returning from ServerDiscoveryActivity
+        if (!isServerConfigured) {
+            isServerConfigured = ServerCheckUtility.checkServerConfigured(this);
+            if (isServerConfigured) {
+                homeRepository = new HomeRepository(requireContext());
+                initializeComponents();
+            }
+        }
+    }
+
+    private void initializeComponents() {
         // Initialize UI components
         etOwner = rootView.findViewById(R.id.etOwner);
         etIpAddress = rootView.findViewById(R.id.etIpAddress);

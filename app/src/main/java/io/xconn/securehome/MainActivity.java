@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 title = "DASHBOARD";
             } else if (item.getItemId() == R.id.nav_devices) {
                 selectedFragment = new AddHomeFragment();
-                title = "DEVICES";
+                title = "HOME";
             } else if (item.getItemId() == R.id.nav_activities) {
                 selectedFragment = new ActivitiesFragment();
                 title = "ACTIVITIES";
