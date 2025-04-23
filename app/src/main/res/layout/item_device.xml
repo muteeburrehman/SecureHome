@@ -1,30 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardDevice"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="3dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="#E0E0E0">
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivDeviceIcon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/device_icon_background"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_device_icon"
             android:contentDescription="Device Icon"
-            android:padding="8dp"
+            android:padding="12dp"
+            android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.App.CircleImageView" />
 
         <TextView
             android:id="@+id/tvDeviceName"
@@ -34,52 +37,77 @@
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="#212121"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/switchStatus"
             app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Living Room Lights" />
 
         <TextView
-            android:id="@+id/tvDeviceStatus"
+            android:id="@+id/tvDeviceType"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:layout_marginEnd="16dp"
-            android:text="Tap to control"
-            android:textColor="#757575"
-            android:textSize="12sp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
             app:layout_constraintEnd_toStartOf="@+id/switchStatus"
             app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
-            app:layout_constraintTop_toBottomOf="@+id/tvDeviceName" />
+            app:layout_constraintTop_toBottomOf="@+id/tvDeviceName"
+            tools:text="Smart Light" />
+
+        <TextView
+            android:id="@+id/tvDeviceStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_status_chip"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:textColor="@android:color/white"
+            android:textSize="11sp"
+            app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
+            app:layout_constraintTop_toBottomOf="@+id/tvDeviceType"
+            tools:backgroundTint="@color/device_active"
+            tools:text="ON" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSchedule"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="8dp"
-            android:minHeight="36dp"
+            android:layout_marginTop="0dp"
+            android:minHeight="32dp"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="0dp"
             android:text="Schedule"
             android:textAllCaps="false"
-            android:textSize="12sp"
+            android:textColor="@color/accent_color"
+            android:textSize="11sp"
             app:icon="@drawable/ic_schedule"
             app:iconGravity="textStart"
             app:iconPadding="4dp"
-            app:iconSize="16dp"
-            app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
-            app:layout_constraintTop_toBottomOf="@+id/tvDeviceStatus" />
+            app:iconSize="14dp"
+            app:iconTint="@color/accent_color"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDeviceStatus"
+            app:layout_constraintStart_toEndOf="@+id/tvDeviceStatus"
+            app:layout_constraintTop_toTopOf="@+id/tvDeviceStatus" />
 
-        <Switch
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switchStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:thumbTint="@color/switch_thumb_selector"
+            app:trackTint="@color/switch_track_selector" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

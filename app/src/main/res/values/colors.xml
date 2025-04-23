@@ -72,4 +72,17 @@
     <color name="rippleColor">#33000000</color>          <!-- Semi-transparent black for ripples -->
     <color name="scrimColor">#52000000</color>           <!-- Semi-transparent black for overlays -->
 
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="divider_color">#EEEEEE</color>
+
+    <!-- Device Status Colors -->
+    <color name="device_active">#4CAF50</color>
+    <color name="device_inactive">#FF5722</color>
+    <color name="device_scheduled">#FF9800</color>
+    <color name="device_offline">#9E9E9E</color>
+
+    <color name="accent_color">#536DFE</color>
+
 </resources>

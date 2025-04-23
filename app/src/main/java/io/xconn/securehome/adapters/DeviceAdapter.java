@@ -6,7 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Switch;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -58,7 +59,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
     static class DeviceViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvDeviceName;
         private final TextView tvDeviceStatus;
-        private final Switch switchStatus;
+        private final SwitchMaterial switchStatus;
         private final Button btnSchedule;
         private final ImageView ivDeviceIcon;
 
