@@ -3,7 +3,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primaryColor">#4CAF50</color>
-    <color name="secondaryColor">#03DAC5</color>
 
 
     <color name="yellow">#ffb300</color>
@@ -18,7 +17,6 @@
     <color name="chat_color">#6C63FF</color>
     <color name="invisible">#00ffffff</color>
     <color name="backgroundColor1">#F2FBFF</color>
-    <color name="backgroundColor">#ffffff</color>
     <color name="textColor">#100E3B</color>
     <color name="strokecol">#d9d9d9</color>
 <!--   <color name="dark_gray">#A9A9A9</color>-->
@@ -29,9 +27,9 @@
     <color name="primary_blue">#2196F3</color>
     <color name="dark_gray">#757575</color>
 
-    <color name="colorPrimary">#3F51B5</color> <!-- Indigo -->
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color> <!-- Pink -->
+<!--    <color name="colorPrimary">#3F51B5</color> &lt;!&ndash; Indigo &ndash;&gt;-->
+<!--    <color name="colorPrimaryDark">#303F9F</color>-->
+<!--    <color name="colorAccent">#FF4081</color> &lt;!&ndash; Pink &ndash;&gt;-->
 
     <!-- Switch colors -->
     <color name="switch_thumb_on">#3F51B5</color>
@@ -43,5 +41,35 @@
 
 
     <color name="chip_background_color">#ECEFF1</color>
+
+    <color name="dividerColor">#E0E0E0</color>
+
+    <color name="colorPrimaryLight">#81D4FA</color>
+    <color name="secondaryTextColor">#757575</color>
+
+    <!-- Base theme colors -->
+    <color name="colorPrimary">#2196F3</color>           <!-- Blue primary -->
+    <color name="colorPrimaryDark">#1976D2</color>       <!-- Darker blue for status bar -->
+    <color name="colorAccent">#FF4081</color>            <!-- Pink accent color -->
+    <color name="colorSecondary">#03A9F4</color>         <!-- Light blue for secondary elements -->
+    <color name="secondaryColor">#03A9F4</color>         <!-- Duplicate for backward compatibility -->
+
+    <!-- Text colors -->
+    <color name="primaryTextColor">#212121</color>       <!-- Dark gray for primary text -->
+    <color name="tertiaryTextColor">#9E9E9E</color>      <!-- Light gray for tertiary text -->
+
+    <!-- Background colors -->
+    <color name="backgroundColor">#FAFAFA</color>        <!-- Very light gray for backgrounds -->
+    <color name="surfaceColor">#FFFFFF</color>           <!-- White for cards, dialogs -->
+
+    <!-- Status colors -->
+    <color name="colorSuccess">#4CAF50</color>           <!-- Green for success states -->
+    <color name="colorError">#F44336</color>             <!-- Red for error states -->
+    <color name="colorWarning">#FFC107</color>           <!-- Yellow for warning states -->
+    <color name="colorInfo">#2196F3</color>              <!-- Blue for info states -->
+
+    <!-- Utility colors -->
+    <color name="rippleColor">#33000000</color>          <!-- Semi-transparent black for ripples -->
+    <color name="scrimColor">#52000000</color>           <!-- Semi-transparent black for overlays -->
 
 </resources>

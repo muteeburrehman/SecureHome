@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -16,6 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import io.xconn.securehome.R;
 import io.xconn.securehome.activities.DeviceListActivity;
@@ -28,10 +30,12 @@ public class HomeListFragment extends Fragment implements HomeAdapter.OnHomeClic
     private RecyclerView recyclerView;
     private HomeAdapter adapter;
     private ProgressBar progressBar;
-    private Button btnAddHome;
+    private ExtendedFloatingActionButton btnAddHome;
     private SwipeRefreshLayout swipeRefreshLayout;
     private HomeRepository homeRepository;
     private View rootView;
+    private ConstraintLayout emptyStateContainer;
+    private View loadingOverlay;
     private boolean isHomesLoaded = false;
 
     @Nullable
@@ -51,9 +55,11 @@ public class HomeListFragment extends Fragment implements HomeAdapter.OnHomeClic
 
         // Initialize UI components
         recyclerView = rootView.findViewById(R.id.recyclerViewHomes);
+        loadingOverlay = rootView.findViewById(R.id.loadingOverlay);
         progressBar = rootView.findViewById(R.id.progressBar);
         btnAddHome = rootView.findViewById(R.id.btnAddHome);
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        emptyStateContainer = rootView.findViewById(R.id.emptyStateContainer);
 
         // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -84,7 +90,6 @@ public class HomeListFragment extends Fragment implements HomeAdapter.OnHomeClic
 
     private void navigateToAddHomeFragment() {
         Log.d(TAG, "Navigating to AddHomeFragment");
-        // Import the fragment from your activities package if needed
         Fragment addHomeFragment = new io.xconn.securehome.activities.AddHomeFragment();
 
         // Replace current fragment with AddHomeFragment
@@ -99,12 +104,15 @@ public class HomeListFragment extends Fragment implements HomeAdapter.OnHomeClic
         homeRepository.getHomes().observe(getViewLifecycleOwner(), homes -> {
             Log.d(TAG, "Home list updated, count: " + homes.size());
             adapter.setHomes(homes);
+            adapter.notifyDataSetChanged(); // Force refresh the adapter
 
             if (homes.isEmpty()) {
-                // Show empty view or message
-                rootView.findViewById(R.id.tvEmptyHomes).setVisibility(View.VISIBLE);
+                // Show empty state
+                emptyStateContainer.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
             } else {
-                rootView.findViewById(R.id.tvEmptyHomes).setVisibility(View.GONE);
+                emptyStateContainer.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
             }
 
             isHomesLoaded = true;  // Set flag to prevent reload in onResume
@@ -112,7 +120,7 @@ public class HomeListFragment extends Fragment implements HomeAdapter.OnHomeClic
 
         // Observe loading state
         homeRepository.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            loadingOverlay.setVisibility(isLoading ? View.VISIBLE : View.GONE);
 
             if (!isLoading) {
                 swipeRefreshLayout.setRefreshing(false);  // Stop refresh animation
@@ -131,15 +139,17 @@ public class HomeListFragment extends Fragment implements HomeAdapter.OnHomeClic
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume called");
-        // Only refresh the list if data was not already loaded or when returning from AddHomeFragment
-        if (!isHomesLoaded || getParentFragmentManager().getBackStackEntryCount() > 0) {
-            Log.d(TAG, "Refreshing data in onResume");
-            homeRepository.fetchHomes();
-            // Clear back stack if returning from add home
-            if (getParentFragmentManager().getBackStackEntryCount() > 0) {
-                getParentFragmentManager().popBackStack();
-            }
+
+        // First check if we're returning from AddHomeFragment
+        if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+            Log.d(TAG, "Returning from AddHomeFragment");
+            // Clear back stack first
+            getParentFragmentManager().popBackStack();
         }
+
+        // Then refresh data in all cases when resuming
+        Log.d(TAG, "Refreshing data in onResume");
+        homeRepository.fetchHomes();
     }
 
     @Override

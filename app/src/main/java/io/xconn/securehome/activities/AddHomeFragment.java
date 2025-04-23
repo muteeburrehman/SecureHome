@@ -126,6 +126,11 @@ public class AddHomeFragment extends Fragment implements HomeRepository.OnHomeAd
         intent.putExtra("HOME_ID", home.getId());
         intent.putExtra("HOME_OWNER", home.getOwner());
         startActivity(intent);
+
+        // Return to previous fragment
+        if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+            getParentFragmentManager().popBackStack();
+        }
     }
 
     @Override
