@@ -13,9 +13,9 @@ public class Home {
     private String ipAddress;
 
     @SerializedName("port")
-    private int port;
+    private String port;
 
-    public Home(String owner, String ipAddress, int port) {
+    public Home(String owner, String ipAddress, String port) {
         this.owner = owner;
         this.ipAddress = ipAddress;
         this.port = port;
@@ -45,11 +45,11 @@ public class Home {
         this.ipAddress = ipAddress;
     }
 
-    public int getPort() {
+    public String getPort() {
         return port;
     }
 
-    public void setPort(int port) {
+    public void setPort(String port) {
         this.port = port;
     }
 }

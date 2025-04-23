@@ -30,7 +30,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".activities.EnterHomeActivity"
+            android:name=".activities.DeviceListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AddDeviceActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.DeviceScheduleActivity"
             android:exported="false" />
         <!-- Splash activity as launcher -->
         <activity

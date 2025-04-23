@@ -105,16 +105,15 @@ public class AddHomeFragment extends Fragment implements HomeRepository.OnHomeAd
             return;
         }
 
-        int port;
-        try {
-            port = Integer.parseInt(portStr);
-        } catch (NumberFormatException e) {
+        // No need to parse to int if we're going to use a string
+        // Just validate that it contains only digits
+        if (!portStr.matches("\\d+")) {
             Toast.makeText(requireContext(), "Port must be a valid number", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create and add new home
-        Home newHome = new Home(owner, ipAddress, port);
+        // Create and add new home with port as string
+        Home newHome = new Home(owner, ipAddress, portStr);
         homeRepository.addHome(newHome, this);
     }
 

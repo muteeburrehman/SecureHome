@@ -37,43 +37,43 @@ public interface ApiService {
     Call<ServerInfoResponse> getServerInfo();
 
     // Home endpoints
-    @POST("homes/")
+    @POST("api/homes/")
     Call<Home> createHome(@Body Home home);
 
-    @GET("homes/")
+    @GET("api/homes/")
     Call<List<Home>> getHomes();
 
     // Device endpoints
-    @POST("homes/{homeId}/devices/")
+    @POST("api/homes/{homeId}/devices/")
     Call<Device> createDevice(@Path("homeId") int homeId, @Body Device device);
 
-    @GET("homes/{homeId}/devices/")
+    @GET("api/homes/{homeId}/devices/")
     Call<List<Device>> getDevices(@Path("homeId") int homeId);
 
-    @PUT("homes/{homeId}/devices/{deviceId}/status")
+    @PUT("api/homes/{homeId}/devices/{deviceId}/status")
     Call<ResponseBody> updateDeviceStatus(
             @Path("homeId") int homeId,
             @Path("deviceId") int deviceId,
             @Body DeviceStatusUpdateRequest status);
 
-    @GET("homes/{homeId}/devices/{deviceId}/status")
+    @GET("api/homes/{homeId}/devices/{deviceId}/status")
     Call<ResponseBody> getDeviceStatus(
             @Path("homeId") int homeId,
             @Path("deviceId") int deviceId);
 
     // Schedule endpoints
-    @POST("homes/{homeId}/devices/{deviceId}/schedule")
+    @POST("api/homes/{homeId}/devices/{deviceId}/schedule")
     Call<MessageResponse> createSchedule(
             @Path("homeId") int homeId,
             @Path("deviceId") int deviceId,
             @Body Schedule schedule);
 
-    @GET("homes/{homeId}/devices/{deviceId}/schedule")
+    @GET("api/homes/{homeId}/devices/{deviceId}/schedule")
     Call<DeviceSchedule> getDeviceSchedules(
             @Path("homeId") int homeId,
             @Path("deviceId") int deviceId);
 
-    @DELETE("homes/{homeId}/devices/{deviceId}/schedule/{scheduleId}")
+    @DELETE("api/homes/{homeId}/devices/{deviceId}/schedule/{scheduleId}")
     Call<MessageResponse> deleteSchedule(
             @Path("homeId") int homeId,
             @Path("deviceId") int deviceId,

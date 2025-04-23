@@ -15,6 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 import io.xconn.securehome.activities.AddHomeFragment;
+import io.xconn.securehome.activities.HomeListFragment;
 import io.xconn.securehome.activities.LoginActivity;
 import io.xconn.securehome.api.FirebaseAuthManager;
 import io.xconn.securehome.maincontroller.ActivitiesFragment;
@@ -93,8 +94,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 selectedFragment = new DashboardFragment();
                 title = "DASHBOARD";
             } else if (item.getItemId() == R.id.nav_devices) {
-                selectedFragment = new AddHomeFragment();
-                title = "HOME";
+                selectedFragment = new HomeListFragment();
+                title = "HOMES";
             } else if (item.getItemId() == R.id.nav_activities) {
                 selectedFragment = new ActivitiesFragment();
                 title = "ACTIVITIES";

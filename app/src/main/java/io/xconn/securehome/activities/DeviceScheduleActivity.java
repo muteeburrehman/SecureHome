@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Switch;
+import androidx.appcompat.widget.SwitchCompat;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -124,7 +124,7 @@ public class DeviceScheduleActivity extends AppCompatActivity implements
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_schedule, null);
         TextView tvSelectedTime = dialogView.findViewById(R.id.tvSelectedTime);
         Button btnSelectTime = dialogView.findViewById(R.id.btnSelectTime);
-        Switch switchOperation = dialogView.findViewById(R.id.switchOperation);
+        SwitchCompat switchOperation = dialogView.findViewById(R.id.switchOperation);
 
         // Changed from CheckBox to Chip with updated IDs
         Chip chipMonday = dialogView.findViewById(R.id.chipMonday);

@@ -63,7 +63,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.HomeViewHolder
 
         public void bind(Home home, OnHomeClickListener listener) {
             tvOwner.setText(home.getOwner());
-            tvIpAddress.setText(String.format("%s:%d", home.getIpAddress(), home.getPort()));
+            tvIpAddress.setText(String.format("%s:%s", home.getIpAddress(), home.getPort()));
             // Note: We don't have device count from the API response
             // We could either fetch it separately or hide this view
             tvDeviceCount.setVisibility(View.GONE);
