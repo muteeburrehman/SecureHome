@@ -7,6 +7,9 @@ public class DeviceSchedule {
     @SerializedName("device_id")
     private int deviceId;
 
+    @SerializedName("device_name")
+    private String deviceName;
+
     @SerializedName("schedules")
     private List<Schedule> schedules;
 
@@ -16,6 +19,14 @@ public class DeviceSchedule {
 
     public void setDeviceId(int deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
     }
 
     public List<Schedule> getSchedules() {

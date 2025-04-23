@@ -1,4 +1,3 @@
-// app/src/main/java/io/xconn/securehome/models/Device.java
 package io.xconn.securehome.models;
 
 import com.google.gson.annotations.SerializedName;
@@ -16,10 +15,14 @@ public class Device {
     @SerializedName("home_id")
     private int homeId;
 
+    @SerializedName("has_schedules")
+    private boolean hasSchedules;
+
     public Device(String name, boolean status, int homeId) {
         this.name = name;
         this.status = status;
         this.homeId = homeId;
+        this.hasSchedules = false; // Default value
     }
 
     public int getId() {
@@ -52,5 +55,13 @@ public class Device {
 
     public void setHomeId(int homeId) {
         this.homeId = homeId;
+    }
+
+    public boolean hasSchedules() {
+        return hasSchedules;
+    }
+
+    public void setHasSchedules(boolean hasSchedules) {
+        this.hasSchedules = hasSchedules;
     }
 }

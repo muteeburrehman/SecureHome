@@ -1,4 +1,3 @@
-// app/src/main/java/io/xconn/securehome/repository/DeviceRepository.java
 package io.xconn.securehome.repository;
 
 import android.content.Context;
@@ -163,6 +162,43 @@ public class DeviceRepository {
                 Log.e(TAG, "Network error when updating device status", t);
             }
         });
+    }
+
+    /**
+     * Updates the hasSchedules property of a device locally.
+     * This method should be called after adding or removing schedules to update the UI.
+     *
+     * @param homeId The ID of the home
+     * @param deviceId The ID of the device to update
+     * @param hasSchedules Whether the device has any schedules
+     */
+    public void updateDeviceHasSchedules(int homeId, int deviceId, boolean hasSchedules) {
+        // Find device in the current list and update it
+        List<Device> currentDevices = devicesLiveData.getValue();
+        if (currentDevices != null) {
+            boolean deviceFound = false;
+            for (Device device : currentDevices) {
+                if (device.getId() == deviceId) {
+                    device.setHasSchedules(hasSchedules);
+                    deviceFound = true;
+                    Log.d(TAG, "Device " + deviceId + " hasSchedules updated to " + hasSchedules);
+                    break;
+                }
+            }
+
+            if (deviceFound) {
+                // Notify observers about the change
+                devicesLiveData.setValue(currentDevices);
+            } else {
+                Log.w(TAG, "Device " + deviceId + " not found in the current list");
+                // If device not in current list, fetch all devices to refresh
+                fetchDevices(homeId);
+            }
+        } else {
+            Log.w(TAG, "Current devices list is null");
+            // If current list is null, fetch all devices
+            fetchDevices(homeId);
+        }
     }
 
     public interface OnDeviceAddedListener {

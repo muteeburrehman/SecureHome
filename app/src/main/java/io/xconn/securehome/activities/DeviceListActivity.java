@@ -1,7 +1,5 @@
 package io.xconn.securehome.activities;
 
-
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -31,6 +29,7 @@ public class DeviceListActivity extends AppCompatActivity implements
     private Button btnAddDevice;
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView tvHomeOwner, tvEmptyDevices;
+    private TextView tvActiveDevices, tvInactiveDevices, tvScheduledDevices;
     private DeviceRepository deviceRepository;
     private int homeId;
     private String homeOwner;
@@ -59,6 +58,11 @@ public class DeviceListActivity extends AppCompatActivity implements
         btnAddDevice = findViewById(R.id.btnAddDevice);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         tvEmptyDevices = findViewById(R.id.tvEmptyDevices);
+
+        // Initialize device count TextViews
+        tvActiveDevices = findViewById(R.id.tvActiveDevices);
+        tvInactiveDevices = findViewById(R.id.tvInactiveDevices);
+        tvScheduledDevices = findViewById(R.id.tvScheduledDevices);
 
         // Set home owner text
         tvHomeOwner.setText(String.format("Home: %s", homeOwner));
@@ -92,6 +96,28 @@ public class DeviceListActivity extends AppCompatActivity implements
         // Observe devices
         deviceRepository.getDevices().observe(this, devices -> {
             adapter.setDevices(devices);
+
+            // Calculate counts
+            int activeCount = 0;
+            int inactiveCount = 0;
+            int scheduledCount = 0;
+
+            for (Device device : devices) {
+                if (device.isStatus()) {
+                    activeCount++;
+                } else {
+                    inactiveCount++;
+                }
+
+                if (device.hasSchedules()) {
+                    scheduledCount++;
+                }
+            }
+
+            // Update UI with counts
+            tvActiveDevices.setText(String.valueOf(activeCount));
+            tvInactiveDevices.setText(String.valueOf(inactiveCount));
+            tvScheduledDevices.setText(String.valueOf(scheduledCount));
 
             if (devices.isEmpty()) {
                 tvEmptyDevices.setVisibility(View.VISIBLE);

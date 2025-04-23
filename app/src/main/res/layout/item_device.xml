@@ -74,8 +74,8 @@
             android:textSize="11sp"
             app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
             app:layout_constraintTop_toBottomOf="@+id/tvDeviceType"
-            tools:backgroundTint="@color/device_active"
-            tools:text="ON" />
+            android:backgroundTint="@color/device_active"
+            android:text="ON" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSchedule"
