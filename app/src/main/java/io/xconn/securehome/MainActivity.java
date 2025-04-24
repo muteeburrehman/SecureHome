@@ -21,6 +21,7 @@ import io.xconn.securehome.api.FirebaseAuthManager;
 import io.xconn.securehome.maincontroller.ActivitiesFragment;
 import io.xconn.securehome.maincontroller.DashboardFragment;
 import io.xconn.securehome.maincontroller.Esp32CamFragment;
+import io.xconn.securehome.utils.ServerCheckUtility;
 import io.xconn.securehome.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -35,6 +36,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!ServerCheckUtility.checkServerConfigured(this)) {
+            // The utility will handle redirection, so we just need to finish this activity
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_main);
 
         // Initialize managers
