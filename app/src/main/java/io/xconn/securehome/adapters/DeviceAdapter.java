@@ -1,17 +1,18 @@
 package io.xconn.securehome.adapters;
 
-
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import com.google.android.material.switchmaterial.SwitchMaterial;
-
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,12 +76,19 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
         public void bind(Device device, OnDeviceListener listener) {
             tvDeviceName.setText(device.getName());
 
-            // Update status text
-            tvDeviceStatus.setText(device.isStatus() ? "Currently On" : "Currently Off");
+            // Update status text and background color
+            boolean isOn = device.isStatus();
+            tvDeviceStatus.setText(isOn ? "ON" : "OFF");
+
+            // Set background color: green for ON, red for OFF
+            int colorRes = isOn ? R.color.device_on_color : R.color.device_off_color;
+            tvDeviceStatus.setBackgroundTintList(
+                    ColorStateList.valueOf(ContextCompat.getColor(itemView.getContext(), colorRes))
+            );
 
             // Set switch without triggering listener
             switchStatus.setOnCheckedChangeListener(null);
-            switchStatus.setChecked(device.isStatus());
+            switchStatus.setChecked(isOn);
 
             // Set up switch listener
             switchStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -93,7 +101,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             btnSchedule.setOnClickListener(v -> listener.onDeviceSchedule(device));
 
             // Update icon based on status
-            ivDeviceIcon.setImageResource(device.isStatus() ?
+            ivDeviceIcon.setImageResource(isOn ?
                     R.drawable.ic_device_on : R.drawable.ic_device_off);
         }
     }

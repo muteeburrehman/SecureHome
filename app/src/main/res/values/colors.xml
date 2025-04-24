@@ -85,4 +85,7 @@
 
     <color name="accent_color">#536DFE</color>
 
+    <color name="device_on_color">#4CAF50</color> <!-- Green -->
+    <color name="device_off_color">#F44336</color> <!-- Red -->
+
 </resources>

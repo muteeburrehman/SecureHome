@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Device Body -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M17,2H7C5.9,2 5,2.9 5,4v16c0,1.1 0.9,2 2,2h10c1.1,0 2,-0.9 2,-2V4C19,2.9 18.1,2 17,2z" />
+
+    <!-- Screen -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M7,6h10v10h-10z" />
+
+    <!-- Power Indicator -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M12,19m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+
+    <!-- Power Wave Indicators -->
+    <path
+        android:pathData="M9,10L15,10"
+        android:strokeWidth="1.5"
+        android:strokeColor="#4CAF50"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M10,12L14,12"
+        android:strokeWidth="1.5"
+        android:strokeColor="#4CAF50"
+        android:strokeLineCap="round" />
+</vector>

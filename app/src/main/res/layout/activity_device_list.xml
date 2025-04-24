@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layoutRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,9 +29,9 @@
                     android:id="@+id/tvHomeOwner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Home: Owner"
+                    android:text="Smart Home"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -56,109 +56,148 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Device Stats Card -->
+            <!-- Device Stats Card with Improved Visuals -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <!-- Card Title -->
+                    <TextView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:paddingHorizontal="16dp"
+                        android:paddingTop="16dp"
+                        android:text="Device Status"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/tvActiveDevices"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="@color/device_active"
-                            android:textSize="24sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Active"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/divider_color" />
-
+                    <!-- Stats Row -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:padding="16dp">
 
-                        <TextView
-                            android:id="@+id/tvInactiveDevices"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="@color/device_inactive"
-                            android:textSize="24sp"
-                            android:textStyle="bold" />
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:layout_marginBottom="8dp"
+                                android:src="@drawable/ic_active_device"
+                                app:tint="@color/device_active" />
+
+                            <TextView
+                                android:id="@+id/tvActiveDevices"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/device_active"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Active"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@color/divider_color" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Inactive"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="14sp" />
-                    </LinearLayout>
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/divider_color" />
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:layout_marginBottom="8dp"
+                                android:src="@drawable/ic_inactive_device"
+                                app:tint="@color/device_inactive" />
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                            <TextView
+                                android:id="@+id/tvInactiveDevices"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/device_inactive"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/tvScheduledDevices"
-                            android:layout_width="wrap_content"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Inactive"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@color/divider_color" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="@color/device_scheduled"
-                            android:textSize="24sp"
-                            android:textStyle="bold" />
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Scheduled"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="14sp" />
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:layout_marginBottom="8dp"
+                                android:src="@drawable/ic_scheduled_device"
+                                app:tint="@color/device_scheduled" />
+
+                            <TextView
+                                android:id="@+id/tvScheduledDevices"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="@color/device_scheduled"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Scheduled"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Devices Header -->
+            <!-- Devices Header with Animation -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="12dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -168,7 +207,7 @@
                     android:layout_weight="1"
                     android:text="My Devices"
                     android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <com.google.android.material.button.MaterialButton
@@ -206,7 +245,7 @@
                         android:clipToPadding="false"
                         android:paddingBottom="80dp" />
 
-                    <!-- Empty State -->
+                    <!-- Empty State with Animation -->
                     <LinearLayout
                         android:id="@+id/layoutEmptyState"
                         android:layout_width="match_parent"
@@ -216,9 +255,9 @@
                         android:visibility="gone">
 
                         <ImageView
-                            android:layout_width="120dp"
-                            android:layout_height="120dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_width="160dp"
+                            android:layout_height="160dp"
+                            android:layout_marginBottom="24dp"
                             android:contentDescription="Empty state illustration"
                             android:src="@drawable/illustration_empty_devices" />
 
@@ -227,9 +266,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="No devices found"
+                            android:text="No devices yet"
                             android:textColor="@color/text_primary"
-                            android:textSize="18sp"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -240,20 +279,23 @@
                             android:gravity="center"
                             android:text="Add your first smart device to start monitoring and controlling your home"
                             android:textColor="@color/text_secondary"
-                            android:textSize="14sp" />
+                            android:textSize="16sp" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnAddFirstDevice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="24dp"
-                            android:paddingHorizontal="24dp"
+                            android:layout_marginTop="32dp"
+                            android:paddingHorizontal="32dp"
+                            android:paddingVertical="12dp"
                             android:text="Add Device"
                             android:textAllCaps="false"
-                            app:cornerRadius="24dp" />
+                            android:textSize="16sp"
+                            app:cornerRadius="24dp"
+                            app:elevation="6dp" />
                     </LinearLayout>
 
-                    <!-- Loading State -->
+                    <!-- Loading State with Animation -->
                     <FrameLayout
                         android:id="@+id/layoutLoadingState"
                         android:layout_width="match_parent"
@@ -263,8 +305,8 @@
                         <ProgressBar
                             android:id="@+id/progressBar"
                             style="?android:attr/progressBarStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:layout_gravity="center"
                             android:indeterminateTint="@color/accent_color" />
                     </FrameLayout>
@@ -273,7 +315,7 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- FAB to add device -->
+    <!-- Enhanced FAB to add device -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddDevice"
         android:layout_width="wrap_content"
@@ -283,6 +325,8 @@
         android:contentDescription="Add Device"
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/accent_color"
-        app:tint="@android:color/white" />
+        app:tint="@android:color/white"
+        app:borderWidth="0dp"
+        app:elevation="8dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
