@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -41,6 +42,7 @@ public class DeviceListActivity extends AppCompatActivity implements
     // UI elements for device counters
     private TextView tvActiveDevices, tvInactiveDevices, tvScheduledDevices;
     private View layoutEmptyState, layoutLoadingState;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +69,9 @@ public class DeviceListActivity extends AppCompatActivity implements
 
         // Initialize UI components
         initializeUI();
+
+        // Setup app bar
+        setupAppBar();
 
         // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -98,13 +103,24 @@ public class DeviceListActivity extends AppCompatActivity implements
         tvEmptyDevices = findViewById(R.id.tvEmptyDevices);
         layoutEmptyState = findViewById(R.id.layoutEmptyState);
         layoutLoadingState = findViewById(R.id.layoutLoadingState);
+        toolbar = findViewById(R.id.toolbar);
 
         // Initialize counter views
         tvActiveDevices = findViewById(R.id.tvActiveDevices);
         tvInactiveDevices = findViewById(R.id.tvInactiveDevices);
         tvScheduledDevices = findViewById(R.id.tvScheduledDevices);
+    }
 
-        // Set home owner text
+    private void setupAppBar() {
+        // Set up the toolbar
+        setSupportActionBar(toolbar);
+
+        // Remove default title
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+
+        // Set home owner text in the app bar
         tvHomeOwner.setText(String.format("Home: %s", homeOwner));
     }
 

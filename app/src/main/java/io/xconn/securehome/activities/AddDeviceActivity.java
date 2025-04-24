@@ -1,30 +1,35 @@
 package io.xconn.securehome.activities;
 
-
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Switch;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.List;
 
 import io.xconn.securehome.R;
 import io.xconn.securehome.models.Device;
 import io.xconn.securehome.repository.DeviceRepository;
 
 public class AddDeviceActivity extends AppCompatActivity implements DeviceRepository.OnDeviceAddedListener {
+    private static final int MAX_DEVICES_ALLOWED = 21;
+
     private EditText etDeviceName;
-    private Switch switchInitialStatus;
+    private SwitchMaterial switchInitialStatus;
     private Button btnAddDevice;
     private ProgressBar progressBar;
     private TextView tvHomeInfo;
     private DeviceRepository deviceRepository;
     private int homeId;
     private String homeOwner;
+    private List<Device> currentDevices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +71,38 @@ public class AddDeviceActivity extends AppCompatActivity implements DeviceReposi
             }
         });
 
+        // Set up device list observer - check device limit
+        deviceRepository.getDevices().observe(this, devices -> {
+            currentDevices = devices;
+            updateDeviceCountUI(devices);
+        });
+
+        // Initial fetch of devices
+        deviceRepository.fetchDevices(homeId);
+
         // Set up button click listener
         btnAddDevice.setOnClickListener(v -> addDevice());
+    }
+
+    private void updateDeviceCountUI(List<Device> devices) {
+        int deviceCount = devices != null ? devices.size() : 0;
+
+        // Update the home info text to include device count
+//        if (tvHomeInfo != null) {
+//            tvHomeInfo.setText(String.format("Adding device to: %s (%d/%d devices)",
+//                    homeOwner, deviceCount, MAX_DEVICES_ALLOWED));
+//        }
+
+        // Disable add button if max devices reached
+        if (deviceCount >= MAX_DEVICES_ALLOWED) {
+            btnAddDevice.setEnabled(false);
+            btnAddDevice.setText("Maximum Devices Reached");
+            btnAddDevice.setTextColor(Color.WHITE);
+            Toast.makeText(this, "Maximum limit of 21 devices reached", Toast.LENGTH_LONG).show();
+        } else {
+            btnAddDevice.setEnabled(true);
+            btnAddDevice.setText("Add Device");
+        }
     }
 
     private void addDevice() {
@@ -77,6 +112,12 @@ public class AddDeviceActivity extends AppCompatActivity implements DeviceReposi
         // Validate input
         if (deviceName.isEmpty()) {
             Toast.makeText(this, "Please enter a device name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check device limit
+        if (currentDevices != null && currentDevices.size() >= MAX_DEVICES_ALLOWED) {
+            Toast.makeText(this, "Cannot add more devices. Maximum limit of 21 devices reached.", Toast.LENGTH_LONG).show();
             return;
         }
 
