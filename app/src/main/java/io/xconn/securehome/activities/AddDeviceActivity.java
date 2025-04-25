@@ -19,7 +19,7 @@ import io.xconn.securehome.models.Device;
 import io.xconn.securehome.repository.DeviceRepository;
 
 public class AddDeviceActivity extends AppCompatActivity implements DeviceRepository.OnDeviceAddedListener {
-    private static final int MAX_DEVICES_ALLOWED = 21;
+    private static final int MAX_DEVICES_ALLOWED = 23;
 
     private EditText etDeviceName;
     private SwitchMaterial switchInitialStatus;

@@ -35,6 +35,7 @@ public class DeviceScheduleActivity extends AppCompatActivity implements
     private Button btnAddSchedule;
     private ProgressBar progressBar;
     private TextView tvDeviceName, tvEmptySchedules;
+    private TextView tvActiveSchedules, tvUpcomingSchedules, tvTotalSchedules;
     private ScheduleRepository scheduleRepository;
     private int homeId;
     private int deviceId;
@@ -65,6 +66,11 @@ public class DeviceScheduleActivity extends AppCompatActivity implements
         progressBar = findViewById(R.id.progressBar);
         tvEmptySchedules = findViewById(R.id.tvEmptySchedules);
 
+        // Initialize the counter TextViews
+        tvActiveSchedules = findViewById(R.id.tvActiveSchedules);
+        tvUpcomingSchedules = findViewById(R.id.tvUpcomingSchedules);
+        tvTotalSchedules = findViewById(R.id.tvTotalSchedules);
+
         // Set device name text
         tvDeviceName.setText(String.format("Device: %s", deviceName));
 
@@ -89,6 +95,9 @@ public class DeviceScheduleActivity extends AppCompatActivity implements
             if (deviceSchedule != null && deviceSchedule.getSchedules() != null) {
                 adapter.setSchedules(deviceSchedule.getSchedules());
 
+                // Update the schedule counters
+                updateScheduleCounters(deviceSchedule.getSchedules());
+
                 if (deviceSchedule.getSchedules().isEmpty()) {
                     tvEmptySchedules.setVisibility(View.VISIBLE);
                 } else {
@@ -97,6 +106,9 @@ public class DeviceScheduleActivity extends AppCompatActivity implements
             } else {
                 adapter.setSchedules(new ArrayList<>());
                 tvEmptySchedules.setVisibility(View.VISIBLE);
+
+                // Update counters to show 0
+                updateScheduleCounters(null);
             }
         });
 
@@ -118,6 +130,52 @@ public class DeviceScheduleActivity extends AppCompatActivity implements
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void updateScheduleCounters(List<Schedule> schedules) {
+        if (schedules == null) {
+            tvActiveSchedules.setText("0");
+            tvUpcomingSchedules.setText("0");
+            tvTotalSchedules.setText("0");
+            return;
+        }
+
+        int totalCount = schedules.size();
+        tvTotalSchedules.setText(String.valueOf(totalCount));
+
+        // Get current time to determine active vs. upcoming
+        Calendar now = Calendar.getInstance();
+        int currentHour = now.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = now.get(Calendar.MINUTE);
+        int currentDay = now.get(Calendar.DAY_OF_WEEK) - 1; // Calendar.DAY_OF_WEEK starts with 1 for Sunday
+
+        int activeCount = 0;
+        int upcomingCount = 0;
+
+        for (Schedule schedule : schedules) {
+            // Parse the schedule time
+            String[] timeParts = schedule.getTime().split(":");
+            int scheduleHour = Integer.parseInt(timeParts[0]);
+            int scheduleMinute = Integer.parseInt(timeParts[1]);
+
+            // Check if the schedule is for today
+            boolean isForToday = schedule.getDays().contains(currentDay);
+
+            // A schedule is active if it's for today and the time has passed
+            boolean isActive = isForToday &&
+                    (scheduleHour < currentHour ||
+                            (scheduleHour == currentHour && scheduleMinute <= currentMinute));
+
+            // A schedule is upcoming if it's for today but time hasn't passed yet,
+            // or it's for a future day
+            boolean isUpcoming = (isForToday && !isActive) || !isForToday;
+
+            if (isActive) activeCount++;
+            if (isUpcoming) upcomingCount++;
+        }
+
+        tvActiveSchedules.setText(String.valueOf(activeCount));
+        tvUpcomingSchedules.setText(String.valueOf(upcomingCount));
     }
 
     private void showAddScheduleDialog() {
