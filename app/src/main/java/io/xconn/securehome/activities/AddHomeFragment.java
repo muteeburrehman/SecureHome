@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment;
 import io.xconn.securehome.R;
 import io.xconn.securehome.models.Home;
 import io.xconn.securehome.repository.HomeRepository;
-import io.xconn.securehome.activities.DeviceListActivity;
 import io.xconn.securehome.utils.ServerCheckUtility;
 
 public class AddHomeFragment extends Fragment implements HomeRepository.OnHomeAddedListener {
@@ -46,7 +45,7 @@ public class AddHomeFragment extends Fragment implements HomeRepository.OnHomeAd
         super.onViewCreated(view, savedInstanceState);
 
         // Check if server is configured first
-        isServerConfigured = ServerCheckUtility.checkServerConfigured(this);
+        isServerConfigured = ServerCheckUtility.checkServerConfigured(requireActivity());
 
         // Only continue initialization if server is configured
         if (isServerConfigured) {
@@ -61,7 +60,7 @@ public class AddHomeFragment extends Fragment implements HomeRepository.OnHomeAd
 
         // Check again when fragment resumes - this handles returning from ServerDiscoveryActivity
         if (!isServerConfigured) {
-            isServerConfigured = ServerCheckUtility.checkServerConfigured(this);
+            isServerConfigured = ServerCheckUtility.checkServerConfigured(requireActivity());
             if (isServerConfigured) {
                 homeRepository = new HomeRepository(requireContext());
                 initializeComponents();

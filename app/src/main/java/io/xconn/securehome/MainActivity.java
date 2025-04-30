@@ -13,18 +13,22 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
-import io.xconn.securehome.activities.AddHomeFragment;
 import io.xconn.securehome.activities.HomeListFragment;
 import io.xconn.securehome.activities.LoginActivity;
+import io.xconn.securehome.activities.ServerDiscoveryActivity;
 import io.xconn.securehome.api.FirebaseAuthManager;
 import io.xconn.securehome.maincontroller.ActivitiesFragment;
 import io.xconn.securehome.maincontroller.DashboardFragment;
 import io.xconn.securehome.maincontroller.Esp32CamFragment;
+import io.xconn.securehome.utils.NetworkChangeReceiver;
 import io.xconn.securehome.utils.ServerCheckUtility;
 import io.xconn.securehome.utils.SessionManager;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener,
+        NetworkChangeReceiver.NetworkChangeListener {
 
     private SessionManager sessionManager;
     private FirebaseAuthManager authManager;
@@ -32,24 +36,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private BottomNavigationView bottomNavigationView;
     private Toolbar toolbar;
+    private NetworkChangeReceiver networkChangeReceiver;
+    private boolean isNetworkCheckPending = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!ServerCheckUtility.checkServerConfigured(this)) {
-            // The utility will handle redirection, so we just need to finish this activity
-            finish();
-            return;
-        }
         setContentView(R.layout.activity_main);
 
         // Initialize managers
         sessionManager = new SessionManager(this);
         authManager = FirebaseAuthManager.getInstance();
 
+        // Setup network change receiver
+        networkChangeReceiver = new NetworkChangeReceiver(this, this);
+        networkChangeReceiver.register();
+
         // Check login state using Firebase
         if (!authManager.isUserLoggedIn()) {
             redirectToLogin();
+            return;
+        }
+
+        // Check if server is configured
+        if (!ServerCheckUtility.checkServerConfigured(this)) {
+            // The ServerCheckUtility will handle redirection
+            isNetworkCheckPending = true;
             return;
         }
 
@@ -62,6 +74,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (savedInstanceState == null) {
             switchFragment(new DashboardFragment(), "DASHBOARD");
             bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // If we're returning from ServerDiscoveryActivity, check again
+        if (isNetworkCheckPending) {
+            isNetworkCheckPending = false;
+            if (ServerCheckUtility.checkServerConfigured(this)) {
+                // Now initialize the activity components
+                setupToolbar();
+                setupNavigationDrawer();
+                setupBottomNavigation();
+
+                // Load default fragment
+                switchFragment(new DashboardFragment(), "DASHBOARD");
+                bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
+            } else {
+                // Still not configured, we'll wait
+                isNetworkCheckPending = true;
+            }
         }
     }
 
@@ -130,6 +165,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         finish();
     }
 
+    private void redirectToServerDiscovery() {
+        startActivity(new Intent(this, ServerDiscoveryActivity.class));
+        // Don't finish this activity so we can return to it
+    }
+
     private void logout() {
         // Use SessionManager logout method that also signs out from Firebase
         sessionManager.logout();
@@ -175,5 +215,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onNetworkChanged(boolean isConnected) {
+        if (isConnected) {
+            // When network comes back, verify server configuration
+            if (!ServerCheckUtility.checkServerConfigured(this)) {
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        "Server configuration not found. Please configure it.",
+                        Snackbar.LENGTH_LONG
+                ).setAction("Configure", v -> redirectToServerDiscovery()).show();
+            }
+        } else {
+            // Notify user about network disconnection
+            Snackbar.make(
+                    findViewById(android.R.id.content),
+                    "Network connection lost. Some features may not work.",
+                    Snackbar.LENGTH_LONG
+            ).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (networkChangeReceiver != null) {
+            networkChangeReceiver.unregister();
+        }
     }
 }

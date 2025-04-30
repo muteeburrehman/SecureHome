@@ -1,57 +1,68 @@
 package io.xconn.securehome.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+import android.util.Log;
 
 import io.xconn.securehome.activities.ServerDiscoveryActivity;
 import io.xconn.securehome.network.ApiConfig;
 
 /**
- * Utility class to handle server IP configuration checks
- * and redirect to ServerDiscoveryActivity when needed
+ * Utility class for checking server configuration status
+ * and handling redirection to the server discovery screen when needed
  */
 public class ServerCheckUtility {
+    private static final String TAG = "ServerCheckUtility";
 
     /**
-     * Checks if server configuration exists, if not redirects to ServerDiscoveryActivity
-     * @param activity The activity context
+     * Checks if the server is configured. If not, redirects to the ServerDiscoveryActivity.
+     *
+     * @param activity The calling activity
      * @return true if server is configured, false otherwise
      */
-    public static boolean checkServerConfigured(AppCompatActivity activity) {
-        if (!ApiConfig.hasServerConfig(activity)) {
-            Toast.makeText(activity, "Server not configured. Please discover and select a server first.",
-                    Toast.LENGTH_SHORT).show();
+    public static boolean checkServerConfigured(Activity activity) {
+        if (activity == null) {
+            return false;
+        }
 
+        boolean isConfigured = false;
+
+        try {
+            isConfigured = ApiConfig.hasServerConfig(activity);
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking server configuration", e);
+            // In case of error, assume server is not configured
+            isConfigured = false;
+        }
+
+        if (!isConfigured) {
+            Log.d(TAG, "Server not configured, redirecting to discovery");
             Intent intent = new Intent(activity, ServerDiscoveryActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             activity.startActivity(intent);
             return false;
         }
+
         return true;
     }
 
     /**
-     * Checks if server configuration exists for fragments, if not redirects to ServerDiscoveryActivity
-     * @param fragment The fragment requesting the check
+     * Silent check for server configuration without redirecting
+     *
+     * @param context Any context (doesn't have to be an Activity)
      * @return true if server is configured, false otherwise
      */
-    public static boolean checkServerConfigured(Fragment fragment) {
-        Context context = fragment.getContext();
-        if (context == null || fragment.getActivity() == null) {
+    public static boolean isServerConfigured(Context context) {
+        if (context == null) {
             return false;
         }
 
-        if (!ApiConfig.hasServerConfig(context)) {
-            Toast.makeText(context, "Server not configured. Please discover and select a server first.",
-                    Toast.LENGTH_SHORT).show();
-
-            Intent intent = new Intent(context, ServerDiscoveryActivity.class);
-            fragment.startActivity(intent);
+        try {
+            return ApiConfig.hasServerConfig(context);
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking server configuration", e);
             return false;
         }
-        return true;
     }
 }

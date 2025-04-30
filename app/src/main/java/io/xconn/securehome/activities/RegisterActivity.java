@@ -10,11 +10,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +27,13 @@ import io.xconn.securehome.R;
 import io.xconn.securehome.adapters.SelectedImagesAdapter;
 import io.xconn.securehome.utils.ImageCaptureHelper;
 import io.xconn.securehome.utils.ImageUploadHelper;
+import io.xconn.securehome.utils.NetworkChangeReceiver;
 import io.xconn.securehome.utils.ServerCheckUtility;
 
-public class RegisterActivity extends AppCompatActivity implements SelectedImagesAdapter.OnImageRemoveListener {
+public class RegisterActivity extends AppCompatActivity implements
+        SelectedImagesAdapter.OnImageRemoveListener,
+        NetworkChangeReceiver.NetworkChangeListener {
+
     private static final int REQUIRED_PHOTO_COUNT = 10;
     private static final int MAX_PHOTO_COUNT = 20;
 
@@ -39,15 +45,30 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
     private AlertDialog uploadDialog;
     private LinearProgressIndicator uploadProgress;
     private RecyclerView recyclerView;
+    private NetworkChangeReceiver networkChangeReceiver;
+    private boolean isNetworkCheckPending = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        // Setup network change receiver
+        networkChangeReceiver = new NetworkChangeReceiver(this, this);
+
+        // Use lifecycle observers if available
+        try {
+            ProcessLifecycleOwner.get().getLifecycle().addObserver(networkChangeReceiver);
+        } catch (NoClassDefFoundError e) {
+            // Fallback - manually register the receiver
+            networkChangeReceiver.register();
+        }
+
         // Check if server is configured first, before initializing anything else
         if (!ServerCheckUtility.checkServerConfigured(this)) {
-            // Return early - the user will be redirected to ServerDiscoveryActivity
+            // The activity will be in a paused state, waiting for the user
+            // to return from ServerDiscoveryActivity
+            isNetworkCheckPending = true;
             return;
         }
 
@@ -55,6 +76,27 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
         setupRecyclerView();
         setupImageHelpers();
         setupClickListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // If we're returning from ServerDiscoveryActivity, check again
+        if (isNetworkCheckPending) {
+            isNetworkCheckPending = false;
+            // Check if server is now configured
+            if (ServerCheckUtility.checkServerConfigured(this)) {
+                // Now initialize the activity
+                initializeViews();
+                setupRecyclerView();
+                setupImageHelpers();
+                setupClickListeners();
+            } else {
+                // Still not configured, we'll wait
+                isNetworkCheckPending = true;
+            }
+        }
     }
 
     private void initializeViews() {
@@ -100,7 +142,6 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
         recyclerView.setNestedScrollingEnabled(false);
     }
 
-    // Rest of the code remains unchanged
     private void setupImageHelpers() {
         imageCaptureHelper = new ImageCaptureHelper(
                 this,
@@ -268,10 +309,75 @@ public class RegisterActivity extends AppCompatActivity implements SelectedImage
     }
 
     @Override
+    public void onNetworkChanged(boolean isConnected) {
+        if (isConnected) {
+            // When network comes back, verify server configuration
+            ServerCheckUtility.checkServerConfigured(this);
+        } else {
+            // Show a message to the user about the network disconnection
+            Snackbar.make(
+                    findViewById(android.R.id.content),
+                    "Network connection lost. Upload may not work.",
+                    Snackbar.LENGTH_LONG
+            ).show();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (uploadDialog != null && uploadDialog.isShowing()) {
             uploadDialog.dismiss();
+        }
+
+        // Clean up network receiver
+        try {
+            ProcessLifecycleOwner.get().getLifecycle().removeObserver(networkChangeReceiver);
+        } catch (NoClassDefFoundError e) {
+            // Manually unregister if we used the fallback method
+            if (networkChangeReceiver != null) {
+                networkChangeReceiver.unregister();
+            }
+        }
+
+        // The ImageCaptureHelper doesn't have a cleanup method, but we can set it to null
+        // to help with garbage collection
+        imageCaptureHelper = null;
+
+        // Clean up any resources from ImageUploadHelper
+        if (imageUploadHelper != null) {
+            // If there's no cancelPendingUploads method, we just null the reference
+            imageUploadHelper = null;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // The ActivityResultLauncher approach used in ImageCaptureHelper makes this not needed,
+        // but we'll keep it for backward compatibility if needed
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // The permissionLauncher used in ImageCaptureHelper handles this automatically,
+        // so we don't need to forward anything
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Check if there are uploaded images and confirm before exiting
+        if (selectedImagesAdapter != null && selectedImagesAdapter.getItemCount() > 0) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Discard Photos")
+                    .setMessage("Are you sure you want to exit? All selected photos will be discarded.")
+                    .setPositiveButton("Exit", (dialog, which) -> super.onBackPressed())
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        } else {
+            super.onBackPressed();
         }
     }
 }
