@@ -15,6 +15,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import io.xconn.securehome.activities.ChangePasswordActivity;
+import io.xconn.securehome.activities.EditProfileActivity;
 import io.xconn.securehome.activities.HomeListFragment;
 import io.xconn.securehome.activities.LoginActivity;
 import io.xconn.securehome.activities.ServerConfigActivity;
@@ -203,12 +205,15 @@ public class MainActivity extends AppCompatActivity implements
 
         if (id == R.id.nav_profile) {
             // TODO: Navigate to profile
+            startActivity(new Intent(this, EditProfileActivity.class));
         } else if (id == R.id.nav_auto) {
             // TODO: Handle auto on-off
         } else if (id == R.id.nav_settings) {
             // TODO: Navigate to settings
         } else if (id == R.id.nav_cp) {
             // TODO: Navigate to change password - could use Firebase password reset
+            startActivity(new Intent(this, ChangePasswordActivity.class));
+
         } else if (id == R.id.nav_faq) {
             // TODO: Open FAQ
         } else if (id == R.id.nav_reportbug) {
