@@ -8,6 +8,11 @@
             android:icon="@mipmap/user"
             android:title="Edit Profile" />
         <item
+            android:id="@+id/action_server_config"
+            android:orderInCategory="100"
+            android:title="Server Configuration"
+            app:showAsAction="never" />
+        <item
             android:id="@+id/nav_auto"
             android:icon="@mipmap/plugin"
             android:title="Auto ON-OFF" />
@@ -32,10 +37,14 @@
             android:icon="@mipmap/privacypolicy"
             android:title="Privacy Policy" />
         <item
+            android:id="@+id/nav_server_config"
+            android:icon="@drawable/ic_settings"
+            android:title="Server Configuration" />
+        <item
             android:id="@+id/pl_switch_menu"
             android:icon="@mipmap/smartphone"
             android:title="Parental Control"
-            app:actionLayout="@layout/parental_control_switch_layout"/>
+            app:actionLayout="@layout/parental_control_switch_layout" />
         <item
             android:id="@+id/nav_logout"
             android:icon="@mipmap/logout"

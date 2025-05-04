@@ -5,18 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import io.xconn.securehome.activities.ServerDiscoveryActivity;
+import io.xconn.securehome.activities.ServerConfigActivity;
 import io.xconn.securehome.network.ApiConfig;
 
 /**
  * Utility class for checking server configuration status
- * and handling redirection to the server discovery screen when needed
+ * and handling redirection to the server configuration screen when needed
  */
 public class ServerCheckUtility {
     private static final String TAG = "ServerCheckUtility";
 
     /**
-     * Checks if the server is configured. If not, redirects to the ServerDiscoveryActivity.
+     * Checks if the server is configured. If not, redirects to the ServerConfigActivity.
      *
      * @param activity The calling activity
      * @return true if server is configured, false otherwise
@@ -37,14 +37,27 @@ public class ServerCheckUtility {
         }
 
         if (!isConfigured) {
-            Log.d(TAG, "Server not configured, redirecting to discovery");
-            Intent intent = new Intent(activity, ServerDiscoveryActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            activity.startActivity(intent);
+            Log.d(TAG, "Server not configured, redirecting to config screen");
+            redirectToServerConfig(activity);
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Redirects to the server configuration screen
+     *
+     * @param activity The calling activity
+     */
+    public static void redirectToServerConfig(Activity activity) {
+        if (activity == null) {
+            return;
+        }
+
+        Intent intent = new Intent(activity, ServerConfigActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        activity.startActivity(intent);
     }
 
     /**

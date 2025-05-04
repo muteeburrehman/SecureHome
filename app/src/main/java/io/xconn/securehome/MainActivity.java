@@ -17,7 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import io.xconn.securehome.activities.HomeListFragment;
 import io.xconn.securehome.activities.LoginActivity;
-import io.xconn.securehome.activities.ServerDiscoveryActivity;
+import io.xconn.securehome.activities.ServerConfigActivity;
 import io.xconn.securehome.api.FirebaseAuthManager;
 import io.xconn.securehome.maincontroller.ActivitiesFragment;
 import io.xconn.securehome.maincontroller.DashboardFragment;
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Check if server is configured
         if (!ServerCheckUtility.checkServerConfigured(this)) {
-            // The ServerCheckUtility will handle redirection
+            // The ServerCheckUtility will handle redirection to ServerConfigActivity
             isNetworkCheckPending = true;
             return;
         }
@@ -81,10 +81,10 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
 
-        // If we're returning from ServerDiscoveryActivity, check again
+        // If we're returning from ServerConfigActivity, check again
         if (isNetworkCheckPending) {
             isNetworkCheckPending = false;
-            if (ServerCheckUtility.checkServerConfigured(this)) {
+            if (ServerCheckUtility.isServerConfigured(this)) {
                 // Now initialize the activity components
                 setupToolbar();
                 setupNavigationDrawer();
@@ -165,8 +165,8 @@ public class MainActivity extends AppCompatActivity implements
         finish();
     }
 
-    private void redirectToServerDiscovery() {
-        startActivity(new Intent(this, ServerDiscoveryActivity.class));
+    private void redirectToServerConfig() {
+        startActivity(new Intent(this, ServerConfigActivity.class));
         // Don't finish this activity so we can return to it
     }
 
@@ -179,13 +179,19 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        // Add server configuration option to the menu
+        menu.add(Menu.NONE, R.id.action_server_config, Menu.NONE, "Server Configuration");
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_logout) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_logout) {
             logout();
+            return true;
+        } else if (itemId == R.id.action_server_config) {
+            redirectToServerConfig();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -211,6 +217,9 @@ public class MainActivity extends AppCompatActivity implements
             // TODO: Open privacy policy
         } else if (id == R.id.nav_logout) {
             logout();
+        } else if (id == R.id.nav_server_config) {
+            // Add server config option to navigation menu
+            redirectToServerConfig();
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -221,12 +230,12 @@ public class MainActivity extends AppCompatActivity implements
     public void onNetworkChanged(boolean isConnected) {
         if (isConnected) {
             // When network comes back, verify server configuration
-            if (!ServerCheckUtility.checkServerConfigured(this)) {
+            if (!ServerCheckUtility.isServerConfigured(this)) {
                 Snackbar.make(
                         findViewById(android.R.id.content),
                         "Server configuration not found. Please configure it.",
                         Snackbar.LENGTH_LONG
-                ).setAction("Configure", v -> redirectToServerDiscovery()).show();
+                ).setAction("Configure", v -> redirectToServerConfig()).show();
             }
         } else {
             // Notify user about network disconnection

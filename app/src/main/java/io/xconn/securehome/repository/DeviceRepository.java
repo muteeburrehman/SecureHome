@@ -1,4 +1,3 @@
-// app/src/main/java/io/xconn/securehome/repository/DeviceRepository.java
 package io.xconn.securehome.repository;
 
 import android.content.Context;
@@ -124,11 +123,11 @@ public class DeviceRepository {
     public void updateDeviceStatus(int homeId, int deviceId, boolean status, OnStatusUpdateListener listener) {
         isLoadingLiveData.setValue(true);
 
+        // First, make the request to update the device status
         DeviceStatusUpdateRequest request = new DeviceStatusUpdateRequest(status);
         apiService.updateDeviceStatus(homeId, deviceId, request).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                isLoadingLiveData.setValue(false);
                 if (response.isSuccessful()) {
                     // Update the device in the list
                     List<Device> currentDevices = devicesLiveData.getValue();
@@ -142,11 +141,10 @@ public class DeviceRepository {
                         devicesLiveData.setValue(currentDevices);
                     }
 
-                    String statusMessage = "Device " + (status ? "turned ON" : "turned OFF") + " successfully";
-                    statusUpdateMessageLiveData.setValue(statusMessage);
-                    listener.onStatusUpdated(statusMessage);
-                    Log.d(TAG, statusMessage);
+                    // Now, send the corresponding ESP32 request based on the status
+                    sendEsp32Request(status, listener);
                 } else {
+                    isLoadingLiveData.setValue(false);
                     String errorMessage = "Failed to update device status: " + response.message();
                     errorMessageLiveData.setValue(errorMessage);
                     listener.onError(errorMessage);
@@ -161,6 +159,40 @@ public class DeviceRepository {
                 errorMessageLiveData.setValue(errorMessage);
                 listener.onError(errorMessage);
                 Log.e(TAG, "Network error when updating device status", t);
+            }
+        });
+    }
+
+    private void sendEsp32Request(boolean status, OnStatusUpdateListener listener) {
+        // Determine the endpoint based on the status
+        String endpoint = status ? "/esp32/GreenON" : "/esp32/GreenOFF";
+
+        // Make the request to the ESP32 endpoint
+        Call<ResponseBody> call = apiService.callEsp32Endpoint(endpoint);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                isLoadingLiveData.setValue(false);
+                if (response.isSuccessful()) {
+                    String statusMessage = "Device " + (status ? "turned ON" : "turned OFF") + " successfully";
+                    statusUpdateMessageLiveData.setValue(statusMessage);
+                    listener.onStatusUpdated(statusMessage);
+                    Log.d(TAG, statusMessage + " (ESP32 notified)");
+                } else {
+                    String errorMessage = "Device status changed but failed to notify ESP32: " + response.message();
+                    errorMessageLiveData.setValue(errorMessage);
+                    listener.onError(errorMessage);
+                    Log.e(TAG, errorMessage);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                isLoadingLiveData.setValue(false);
+                String errorMessage = "Device status changed but failed to connect to ESP32: " + t.getMessage();
+                errorMessageLiveData.setValue(errorMessage);
+                listener.onError(errorMessage);
+                Log.e(TAG, "Network error when connecting to ESP32", t);
             }
         });
     }

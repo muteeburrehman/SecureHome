@@ -29,4 +29,15 @@
     <string name="camera_view">Camera View</string>
     <string name="title_activity_settings">Settings</string>
     <string name="homes">Homes</string>
+
+
+    <!-- Add these string resources to your strings.xml file -->
+    <string name="server_configuration">Server Configuration</string>
+    <string name="enter_server_ip">Enter Server IP Address</string>
+    <string name="enter_server_port">Enter Server Port</string>
+    <string name="test_connection">Test Connection</string>
+    <string name="save_and_connect">Save and Connect</string>
+    <string name="server_not_configured">Server not configured. Please configure it.</string>
+    <string name="connection_successful">Connection successful</string>
+    <string name="connection_failed">Connection failed</string>
 </resources>

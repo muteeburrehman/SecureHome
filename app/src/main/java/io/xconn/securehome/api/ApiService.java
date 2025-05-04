@@ -1,4 +1,3 @@
-// app/src/main/java/io/xconn/securehome/api/ApiService.java
 package io.xconn.securehome.api;
 
 import java.util.List;
@@ -22,6 +21,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Url;
 
 public interface ApiService {
     // Original endpoints
@@ -78,4 +78,8 @@ public interface ApiService {
             @Path("homeId") int homeId,
             @Path("deviceId") int deviceId,
             @Path("scheduleId") int scheduleId);
+
+    // ESP32 endpoints
+    @GET
+    Call<ResponseBody> callEsp32Endpoint(@Url String url);
 }
