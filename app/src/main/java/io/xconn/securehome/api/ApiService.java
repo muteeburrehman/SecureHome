@@ -80,6 +80,6 @@ public interface ApiService {
             @Path("scheduleId") int scheduleId);
 
     // ESP32 endpoints
-    @GET
+    @POST
     Call<ResponseBody> callEsp32Endpoint(@Url String url);
 }

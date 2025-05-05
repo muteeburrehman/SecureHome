@@ -20,6 +20,7 @@ import retrofit2.Response;
 public class DeviceRepository {
     private static final String TAG = "DeviceRepository";
     private final ApiService apiService;
+    private final ApiService esp32ApiService; // Separate API service for ESP32
     private final Context context;
     private final MutableLiveData<List<Device>> devicesLiveData = new MutableLiveData<>();
     private final MutableLiveData<Device> currentDeviceLiveData = new MutableLiveData<>();
@@ -29,7 +30,9 @@ public class DeviceRepository {
 
     public DeviceRepository(Context context) {
         this.context = context;
-        this.apiService = RetrofitClient.getInstance(context).getApi();
+        RetrofitClient retrofitClient = RetrofitClient.getInstance(context);
+        this.apiService = retrofitClient.getApi();
+        this.esp32ApiService = retrofitClient.getEsp32Api(); // Get the ESP32-specific API service
         devicesLiveData.setValue(new ArrayList<>());
         isLoadingLiveData.setValue(false);
     }
@@ -165,10 +168,10 @@ public class DeviceRepository {
 
     private void sendEsp32Request(boolean status, OnStatusUpdateListener listener) {
         // Determine the endpoint based on the status
-        String endpoint = status ? "/esp32/GreenON" : "/esp32/GreenOFF";
+        String endpoint = status ? "/GreenON" : "/GreenOFF";  // Remove the "/esp32" prefix
 
-        // Make the request to the ESP32 endpoint
-        Call<ResponseBody> call = apiService.callEsp32Endpoint(endpoint);
+        // Make the request to the ESP32 endpoint using the ESP32-specific API service
+        Call<ResponseBody> call = esp32ApiService.callEsp32Endpoint(endpoint);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
