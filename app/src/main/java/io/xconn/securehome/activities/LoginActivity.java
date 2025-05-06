@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import io.xconn.securehome.MainActivity;
 import io.xconn.securehome.R;
 import io.xconn.securehome.api.FirebaseAuthManager;
+import io.xconn.securehome.models.UserModel;
 import io.xconn.securehome.utils.SessionManager;
 
 public class LoginActivity extends AppCompatActivity {
@@ -30,17 +31,17 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // Initialize views first, regardless of login status
+        initializeViews();
+        setupListeners();
+
         authManager = FirebaseAuthManager.getInstance();
         sessionManager = new SessionManager(this);
 
-        // If user is already logged in, go straight to main activity
+        // Now check login status after views are initialized
         if (authManager.isUserLoggedIn()) {
-            navigateToMainActivity();
-            return;
+            checkUserStatusAndNavigate();
         }
-
-        initializeViews();
-        setupListeners();
     }
 
     private void initializeViews() {
@@ -74,22 +75,99 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         showLoading(true);
-        authManager.login(email, password, task -> {
-            showLoading(false);
-            if (task.isSuccessful()) {
-                handleLoginSuccess(email);
-            } else {
+        authManager.login(email, password, null, new FirebaseAuthManager.AuthCallback() {
+            @Override
+            public void onSuccess(UserModel userModel) {
+                showLoading(false);
+                if (userModel.isApproved() || userModel.isAdmin()) {
+                    handleLoginSuccess(userModel);
+                } else if (userModel.isPending()) {
+                    // User is pending approval, send to pending screen
+                    sessionManager.createLoginSession(
+                            userModel.getUserId(),
+                            userModel.getEmail(),
+                            userModel.getRole(),
+                            userModel.getApprovalStatus()
+                    );
+                    navigateToPendingScreen();
+                } else {
+                    // User was rejected
+                    Toast.makeText(LoginActivity.this,
+                            "Your account has been rejected. Please contact an administrator.",
+                            Toast.LENGTH_LONG).show();
+                    authManager.logout(); // Log out since they can't access the app
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                showLoading(false);
                 Toast.makeText(LoginActivity.this,
-                        "Authentication failed: " + task.getException().getMessage(),
+                        "Authentication failed: " + e.getMessage(),
                         Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void handleLoginSuccess(String email) {
-        sessionManager.setLoggedIn(true);
-        sessionManager.saveUserEmail(email);
+    private void handleLoginSuccess(UserModel userModel) {
+        sessionManager.createLoginSession(
+                userModel.getUserId(),
+                userModel.getEmail(),
+                userModel.getRole(),
+                userModel.getApprovalStatus()
+        );
         navigateToMainActivity();
+    }
+
+    private void navigateToPendingScreen() {
+        Intent intent = new Intent(LoginActivity.this, PendingApprovalActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void checkUserStatusAndNavigate() {
+        showLoading(true);
+        authManager.getCurrentUserModel(new FirebaseAuthManager.AuthCallback() {
+            @Override
+            public void onSuccess(UserModel userModel) {
+                showLoading(false);
+                if (userModel.isApproved() || userModel.isAdmin()) {
+                    // Update session data just in case
+                    sessionManager.createLoginSession(
+                            userModel.getUserId(),
+                            userModel.getEmail(),
+                            userModel.getRole(),
+                            userModel.getApprovalStatus()
+                    );
+                    navigateToMainActivity();
+                } else if (userModel.isPending()) {
+                    // User is pending approval
+                    sessionManager.createLoginSession(
+                            userModel.getUserId(),
+                            userModel.getEmail(),
+                            userModel.getRole(),
+                            userModel.getApprovalStatus()
+                    );
+                    navigateToPendingScreen();
+                } else {
+                    // User was rejected
+                    Toast.makeText(LoginActivity.this,
+                            "Your account has been rejected. Please contact an administrator.",
+                            Toast.LENGTH_LONG).show();
+                    authManager.logout(); // Log them out
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                showLoading(false);
+                // Clear session and stay on login screen
+                sessionManager.clearSession();
+                Toast.makeText(LoginActivity.this,
+                        "Error checking user status: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void navigateToMainActivity() {
@@ -100,5 +178,8 @@ public class LoginActivity extends AppCompatActivity {
     private void showLoading(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         loginButton.setEnabled(!show);
+        emailInput.setEnabled(!show);
+        passwordInput.setEnabled(!show);
+        registerLink.setEnabled(!show);
     }
 }

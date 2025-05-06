@@ -1,8 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- main_menu.xml - Updated to include admin and logout options -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_admin"
+        android:title="Admin Dashboard"
+        android:icon="@drawable/ic_admin"
+        android:visible="false"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_logout"
+        android:title="Logout"
+        android:icon="@drawable/ic_logout"
+        app:showAsAction="never"/>
+
     <item
         android:id="@+id/action_logout"
         android:title="Logout"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_server_config"
+        android:title="Server Configuration"
+        android:orderInCategory="100"
         app:showAsAction="never"/>
 </menu>

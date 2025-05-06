@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,15 +17,18 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import io.xconn.securehome.activities.AdminDashboardActivity;
 import io.xconn.securehome.activities.ChangePasswordActivity;
 import io.xconn.securehome.activities.EditProfileActivity;
 import io.xconn.securehome.activities.HomeListFragment;
 import io.xconn.securehome.activities.LoginActivity;
+import io.xconn.securehome.activities.PendingApprovalActivity;
 import io.xconn.securehome.activities.ServerConfigActivity;
 import io.xconn.securehome.api.FirebaseAuthManager;
 import io.xconn.securehome.maincontroller.ActivitiesFragment;
 import io.xconn.securehome.maincontroller.DashboardFragment;
 import io.xconn.securehome.maincontroller.Esp32CamFragment;
+import io.xconn.securehome.models.UserModel;
 import io.xconn.securehome.utils.NetworkChangeReceiver;
 import io.xconn.securehome.utils.ServerCheckUtility;
 import io.xconn.securehome.utils.SessionManager;
@@ -40,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     private NetworkChangeReceiver networkChangeReceiver;
     private boolean isNetworkCheckPending = false;
+    private TextView userNameHeaderView; // Added for user name display in nav header
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements
             redirectToLogin();
             return;
         }
+
+        // Check user approval status
+        checkUserStatus();
 
         // Check if server is configured
         if (!ServerCheckUtility.checkServerConfigured(this)) {
@@ -100,6 +109,11 @@ public class MainActivity extends AppCompatActivity implements
                 isNetworkCheckPending = true;
             }
         }
+
+        // Check user status whenever we resume the activity
+        if (authManager.isUserLoggedIn()) {
+            checkUserStatus();
+        }
     }
 
     private void setupToolbar() {
@@ -112,19 +126,38 @@ public class MainActivity extends AppCompatActivity implements
         navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // Update navigation header with user info if needed
-        if (authManager.getCurrentUser() != null) {
-            // If you have a header view with user info fields, you can update them here
-            // View headerView = navigationView.getHeaderView(0);
-            // TextView userNameView = headerView.findViewById(R.id.user_name);
-            // userNameView.setText(authManager.getCurrentUser().getDisplayName());
-        }
+        // Update navigation header with user info
+        View headerView = navigationView.getHeaderView(0);
+        userNameHeaderView = headerView.findViewById(R.id.user_name);
+
+        // Update header with user info if available
+        updateNavigationHeader();
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+    }
+
+    private void updateNavigationHeader() {
+        if (authManager.getCurrentUser() != null && userNameHeaderView != null) {
+            // Get user info from Firebase and update the header
+            authManager.getCurrentUserModel(new FirebaseAuthManager.AuthCallback() {
+                @Override
+                public void onSuccess(UserModel userModel) {
+                    if (userModel != null && userModel.getDisplayName() != null) {
+                        userNameHeaderView.setText("Welcome, " + userModel.getDisplayName());
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    // Just log the error but don't block UI
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     private void setupBottomNavigation() {
@@ -155,6 +188,61 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    private void checkUserStatus() {
+        authManager.getCurrentUserModel(new FirebaseAuthManager.AuthCallback() {
+            @Override
+            public void onSuccess(UserModel userModel) {
+                if (userModel != null) {
+                    if (userModel.isAdmin() || userModel.isApproved()) {
+                        // Update session data
+                        sessionManager.createLoginSession(
+                                userModel.getUserId(),
+                                userModel.getEmail(),
+                                userModel.getRole(),
+                                userModel.getApprovalStatus()
+                        );
+
+                        // Update navigation menu based on user role
+                        updateMenuForUserRole(userModel);
+
+                        // Update the header if it exists
+                        if (userNameHeaderView != null) {
+                            userNameHeaderView.setText("Welcome, " + userModel.getDisplayName());
+                        }
+                    } else {
+                        // User is pending approval
+                        startActivity(new Intent(MainActivity.this, PendingApprovalActivity.class));
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Error getting user data
+                e.printStackTrace();
+                Snackbar.make(
+                        findViewById(android.R.id.content),
+                        "Error retrieving user data. Please try again.",
+                        Snackbar.LENGTH_LONG
+                ).show();
+            }
+        });
+    }
+
+    private void updateMenuForUserRole(UserModel userModel) {
+        // Update menu visibility based on user role
+        if (navigationView != null && navigationView.getMenu() != null) {
+            MenuItem adminMenuItem = navigationView.getMenu().findItem(R.id.nav_admin);
+            if (adminMenuItem != null) {
+                adminMenuItem.setVisible(userModel.isAdmin());
+            }
+        }
+
+        // Invalidate options menu to refresh
+        invalidateOptionsMenu();
+    }
+
     private void switchFragment(Fragment fragment, String title) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
@@ -163,7 +251,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void redirectToLogin() {
-        startActivity(new Intent(this, LoginActivity.class));
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         finish();
     }
 
@@ -173,27 +263,36 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void logout() {
-        // Use SessionManager logout method that also signs out from Firebase
-        sessionManager.logout();
+        // Use both authManager and sessionManager to ensure complete logout
+        authManager.logout();
+        sessionManager.clearSession();
         redirectToLogin();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        // Add server configuration option to the menu
-        menu.add(Menu.NONE, R.id.action_server_config, Menu.NONE, "Server Configuration");
+
+        // Show/hide admin menu item based on role
+        MenuItem adminMenuItem = menu.findItem(R.id.menu_admin);
+        if (adminMenuItem != null) {
+            adminMenuItem.setVisible(sessionManager.isAdmin());
+        }
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.action_logout) {
+        if (itemId == R.id.action_logout || itemId == R.id.menu_logout) {
             logout();
             return true;
         } else if (itemId == R.id.action_server_config) {
             redirectToServerConfig();
+            return true;
+        } else if (itemId == R.id.menu_admin) {
+            startActivity(new Intent(MainActivity.this, AdminDashboardActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -204,27 +303,26 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == R.id.nav_profile) {
-            // TODO: Navigate to profile
             startActivity(new Intent(this, EditProfileActivity.class));
         } else if (id == R.id.nav_auto) {
-            // TODO: Handle auto on-off
+            // Handle auto on-off
         } else if (id == R.id.nav_settings) {
-            // TODO: Navigate to settings
+            // Navigate to settings
         } else if (id == R.id.nav_cp) {
-            // TODO: Navigate to change password - could use Firebase password reset
             startActivity(new Intent(this, ChangePasswordActivity.class));
-
         } else if (id == R.id.nav_faq) {
-            // TODO: Open FAQ
+            // Open FAQ
         } else if (id == R.id.nav_reportbug) {
-            // TODO: Navigate to report issue
+            // Navigate to report issue
         } else if (id == R.id.nav_pp) {
-            // TODO: Open privacy policy
+            // Open privacy policy
         } else if (id == R.id.nav_logout) {
             logout();
-        } else if (id == R.id.nav_server_config) {
-            // Add server config option to navigation menu
+        } else if (id == R.id.nav_server_config || id == R.id.action_server_config) {
             redirectToServerConfig();
+        } else if (id == R.id.nav_admin) {
+            // Admin dashboard
+            startActivity(new Intent(this, AdminDashboardActivity.class));
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
