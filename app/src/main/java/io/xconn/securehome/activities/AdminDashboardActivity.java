@@ -1,6 +1,8 @@
 package io.xconn.securehome.activities;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -11,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,6 +48,8 @@ public class AdminDashboardActivity extends AppCompatActivity implements UserAda
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
+
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
 
         dbManager = FirebaseDatabaseManager.getInstance();
 
@@ -131,37 +136,53 @@ public class AdminDashboardActivity extends AppCompatActivity implements UserAda
         }
     }
 
-    private void handleLoadError(Exception e) {
-        showLoading(false);
-        userList.clear();
-        userAdapter.updateUserList(userList);
-        emptyView.setText("Error loading users: " + (e != null ? e.getMessage() : "Unknown error"));
-        emptyView.setVisibility(View.VISIBLE);
-        userRecyclerView.setVisibility(View.GONE);
 
-        Toast.makeText(this, "Failed to load users: " +
-                (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_SHORT).show();
-    }
 
     private void handleUsersLoaded(com.google.firebase.firestore.QuerySnapshot result) {
         showLoading(false);
         userList.clear();
+        int currentTab = tabLayout.getSelectedTabPosition();
+        String tabName = currentTab == TAB_ALL ? "ALL" : (currentTab == TAB_PENDING ? "PENDING" : "APPROVED");
+
+        Log.d("AdminDashboard", "handleUsersLoaded for tab: " + tabName);
 
         if (result != null && !result.isEmpty()) {
+            Log.d("AdminDashboard", "Query returned " + result.size() + " documents for tab " + tabName);
             for (DocumentSnapshot document : result.getDocuments()) {
                 UserModel user = document.toObject(UserModel.class);
                 if (user != null) {
-                    // Ensure the userId is set if coming from Firestore
-                    if (user.getUserId() == null) {
+                    if (user.getUserId() == null) { // Good practice
                         user.setUserId(document.getId());
                     }
+                    Log.d("AdminDashboard", "Fetched User -> Email: " + user.getEmail() +
+                            ", Role: " + user.getRole() +
+                            ", Status: " + user.getApprovalStatus());
                     userList.add(user);
+                } else {
+                    Log.w("AdminDashboard", "Document " + document.getId() + " could not be converted to UserModel.");
                 }
             }
+        } else {
+            Log.d("AdminDashboard", "Query for tab " + tabName + " returned null or empty result.");
         }
 
-        userAdapter.updateUserList(userList);
+        userAdapter.updateUserList(userList); // Make sure this is called after populating userList
         updateEmptyView();
+    }
+
+    private void handleLoadError(Exception e) {
+        showLoading(false);
+        userList.clear();
+        userAdapter.updateUserList(userList); // Update adapter even on error
+        int currentTab = tabLayout.getSelectedTabPosition();
+        String tabName = currentTab == TAB_ALL ? "ALL" : (currentTab == TAB_PENDING ? "PENDING" : "APPROVED");
+        Log.e("AdminDashboard", "Error loading users for tab " + tabName, e);
+
+        emptyView.setText("Error loading users: " + (e != null ? e.getMessage() : "Unknown error"));
+        emptyView.setVisibility(View.VISIBLE);
+        userRecyclerView.setVisibility(View.GONE);
+        Toast.makeText(this, "Failed to load users: " +
+                (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_SHORT).show();
     }
 
     private void updateEmptyView() {

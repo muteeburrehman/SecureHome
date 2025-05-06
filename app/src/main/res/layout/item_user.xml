@@ -58,34 +58,34 @@
                 tools:text="Status: Pending"
                 tools:textColor="@color/colorWarning" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_approve"
-                style="@style/Widget.AppCompat.Button.Colored"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="@color/colorSuccess"
                 android:text="Approve"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                app:backgroundTint="@color/colorSuccess" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_reject"
-                style="@style/Widget.AppCompat.Button.Colored"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:backgroundTint="@color/colorWarning"
                 android:text="Reject"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                app:backgroundTint="@color/colorWarning" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_remove"
-                style="@style/Widget.AppCompat.Button.Colored"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:backgroundTint="@color/red_active"
                 android:text="Remove"
                 android:textSize="12sp"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:backgroundTint="@color/red_active" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
