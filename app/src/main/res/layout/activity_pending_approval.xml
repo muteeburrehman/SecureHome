@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor1"
     tools:context=".activities.PendingApprovalActivity">
 
     <LinearLayout
@@ -21,8 +22,8 @@
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:layout_marginBottom="20dp"
-            android:src="@drawable/ic_pending"
-            android:contentDescription="Pending approval icon" />
+            android:contentDescription="Pending approval icon"
+            android:src="@drawable/ic_pending" />
 
         <TextView
             android:layout_width="match_parent"
@@ -46,7 +47,9 @@
             android:id="@+id/logout_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log Out" />
+            android:text="Log Out"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/colorPrimary" />
 
     </LinearLayout>
 
