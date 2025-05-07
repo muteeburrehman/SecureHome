@@ -67,4 +67,7 @@ dependencies {
 
     implementation libs.firebase.auth
     implementation libs.lifecycle.process
+
+    implementation libs.toggle
+
 }

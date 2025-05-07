@@ -40,4 +40,6 @@
     <string name="server_not_configured">Server not configured. Please configure it.</string>
     <string name="connection_successful">Connection successful</string>
     <string name="connection_failed">Connection failed</string>
+
+
 </resources>

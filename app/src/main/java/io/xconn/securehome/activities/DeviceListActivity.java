@@ -393,6 +393,43 @@ public class DeviceListActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onDeviceFavorite(Device device, boolean isFavorite) {
+        try {
+            // Implement favorite functionality here
+            // This could update a repository method to mark the device as favorite
+            Log.d(TAG, "Device favorite toggled: " + device.getName() + " - " + isFavorite);
+            Toast.makeText(this,
+                    device.getName() + (isFavorite ? " added to" : " removed from") + " favorites",
+                    Toast.LENGTH_SHORT).show();
+
+            // Here you would typically call your repository to update the favorite status
+            // Example: deviceRepository.updateDeviceFavorite(homeId, device.getId(), isFavorite, this);
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating device favorite status", e);
+            Toast.makeText(this, "Error updating favorite status", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onDeviceSettings(Device device) {
+        try {
+            // Implement settings navigation here
+            Log.d(TAG, "Opening settings for device: " + device.getName());
+            Toast.makeText(this, "Device settings not yet implemented", Toast.LENGTH_SHORT).show();
+
+            // Example implementation:
+            // Intent intent = new Intent(this, DeviceSettingsActivity.class);
+            // intent.putExtra("HOME_ID", homeId);
+            // intent.putExtra("DEVICE_ID", device.getId());
+            // intent.putExtra("DEVICE_NAME", device.getName());
+            // startActivity(intent);
+        } catch (Exception e) {
+            Log.e(TAG, "Error opening device settings", e);
+            Toast.makeText(this, "Error opening settings screen", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
     public void onStatusUpdated(String message) {
         try {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();

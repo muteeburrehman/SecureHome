@@ -112,4 +112,17 @@
     <color name="card_stroke">#E6E8F0</color>
     <color name="icon_background">#F0F1FA</color>
 
+    <color name="card_gradient_start">#FFFFFF</color>
+    <color name="card_gradient_end">#F8F9FC</color>
+    <color name="slider_inactive">#E0E0E0</color>
+    <color name="warm_light">#FFCC80</color>
+
+    <color name="switch_on_color">#4CAF50</color>
+    <color name="switch_off_color">#BDBDBD</color>
+
+    <color name="neutral_light">#FFFDE7</color>
+    <color name="cool_light">#B3E5FC</color>
+    <color name="red_light">#FFCDD2</color>
+    <color name="blue_light">#BBDEFB</color>
+    <color name="green_light">#C8E6C9</color>
 </resources>

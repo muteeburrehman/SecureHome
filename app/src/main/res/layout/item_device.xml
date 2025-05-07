@@ -5,109 +5,333 @@
     android:id="@+id/cardDevice"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="4dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="0dp">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Adding StateListAnimator for interactive card elevation -->
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/deviceCardMotionLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        app:layoutDescription="@xml/device_card_scene">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/ivDeviceIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_device_icon"
-            android:contentDescription="Device Icon"
-            android:padding="12dp"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.App.CircleImageView" />
-
-        <TextView
-            android:id="@+id/tvDeviceName"
+        <!-- Background gradient container -->
+        <View
+            android:id="@+id/cardBackground"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/switchStatus"
-            app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Living Room Lights" />
-
-        <TextView
-            android:id="@+id/tvDeviceType"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp"
-            app:layout_constraintEnd_toStartOf="@+id/switchStatus"
-            app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
-            app:layout_constraintTop_toBottomOf="@+id/tvDeviceName"
-            tools:text="Smart Light" />
-
-        <TextView
-            android:id="@+id/tvDeviceStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/bg_status_chip"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="2dp"
-            android:textColor="@android:color/white"
-            android:textSize="11sp"
-            app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
-            app:layout_constraintTop_toBottomOf="@+id/tvDeviceType"
-            tools:backgroundTint="@color/device_active"
-            tools:text="ON" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSchedule"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            android:minHeight="32dp"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="0dp"
-            android:text="Schedule"
-            android:textAllCaps="false"
-            android:textColor="@color/accent_color"
-            android:textSize="11sp"
-            app:icon="@drawable/ic_schedule"
-            app:iconGravity="textStart"
-            app:iconPadding="4dp"
-            app:iconSize="14dp"
-            app:iconTint="@color/accent_color"
-            app:layout_constraintBottom_toBottomOf="@+id/tvDeviceStatus"
-            app:layout_constraintStart_toEndOf="@+id/tvDeviceStatus"
-            app:layout_constraintTop_toTopOf="@+id/tvDeviceStatus" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_card_gradient"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:thumbTint="@color/switch_thumb_selector"
-            app:trackTint="@color/switch_track_selector" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Main card content -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainContentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <!-- Device icon with animated container -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivDeviceIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_device_icon_animated"
+                android:contentDescription="Device Icon"
+                android:padding="12dp"
+                android:scaleType="centerInside"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.App.CircleImageView" />
+
+            <!-- Interactive status indicator -->
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/deviceStatusAnimation"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="-8dp"
+                android:layout_marginStart="44dp"
+                app:layout_constraintStart_toStartOf="@id/ivDeviceIcon"
+                app:layout_constraintTop_toTopOf="@id/ivDeviceIcon"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/pulse_animation" />
+
+            <!-- Device name with custom font -->
+            <TextView
+                android:id="@+id/tvDeviceName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/mazzardhmedium"
+                app:layout_constraintEnd_toStartOf="@+id/interactiveSwitch"
+                app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Living Room Lights" />
+
+            <!-- Device type with improved styling -->
+            <TextView
+                android:id="@+id/tvDeviceType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:fontFamily="@font/mazzardhlight"
+                app:layout_constraintEnd_toStartOf="@+id/interactiveSwitch"
+                app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
+                app:layout_constraintTop_toBottomOf="@+id/tvDeviceName"
+                tools:text="Smart Light" />
+
+            <!-- Status label with dynamic color -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDeviceStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:fontFamily="@font/mazzardhregular"
+                app:chipBackgroundColor="@color/device_active"
+                app:chipMinHeight="24dp"
+                app:chipStartPadding="8dp"
+                app:chipEndPadding="8dp"
+                app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
+                app:layout_constraintTop_toBottomOf="@+id/tvDeviceType"
+                tools:text="ON" />
+
+            <!-- Quick action buttons row -->
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/deviceQuickActions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="@id/chipDeviceStatus"
+                app:layout_constraintTop_toBottomOf="@id/chipDeviceStatus"
+                app:singleSelection="false"
+                app:selectionRequired="false">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSchedule"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:padding="0dp"
+                    android:layout_marginEnd="8dp"
+                    app:icon="@drawable/ic_schedule"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="@color/accent_color"
+                    app:strokeColor="@color/accent_color"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="18dp"
+                    android:contentDescription="Schedule" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFavorite"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:padding="0dp"
+                    android:layout_marginEnd="8dp"
+                    app:icon="@drawable/ic_favorite"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="@color/accent_color"
+                    app:strokeColor="@color/accent_color"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="18dp"
+                    android:contentDescription="Favorite" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSettings"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/ic_settings"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="@color/accent_color"
+                    app:strokeColor="@color/accent_color"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="18dp"
+                    android:contentDescription="Settings" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <!-- Modern interactive switch -->
+            <com.github.angads25.toggle.widget.LabeledSwitch
+                android:id="@+id/interactiveSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:on="true"
+                app:colorOn="@color/switch_on_color"
+                app:colorOff="@color/switch_off_color"
+                app:textOn=""
+                app:textOff=""
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <!-- Dynamic usage statistics -->
+            <LinearLayout
+                android:id="@+id/usageStatsContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/interactiveSwitch">
+
+                <TextView
+                    android:id="@+id/tvUsageStat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:fontFamily="@font/mazzardhregular"
+                    tools:text="8.2 kWh" />
+
+                <ImageView
+                    android:id="@+id/ivUsageIndicator"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_trend_up"
+                    android:contentDescription="Usage Trend" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Expandable details section -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/expandedContentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/mainContentLayout">
+
+            <!-- Device controls (will appear when expanded) -->
+            <com.google.android.material.slider.Slider
+                android:id="@+id/brightnessSlider"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="8dp"
+                app:thumbColor="@color/accent_color"
+                app:trackColorActive="@color/accent_color"
+                app:trackColorInactive="@color/slider_inactive"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvSliderLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Brightness"
+                android:textSize="12sp"
+                android:fontFamily="@font/mazzardhlight"
+                android:textColor="@color/text_tertiary"
+                app:layout_constraintStart_toStartOf="@id/brightnessSlider"
+                app:layout_constraintTop_toBottomOf="@id/brightnessSlider" />
+
+            <!-- Color selection for lights -->
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/colorSelectionGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSliderLabel">
+
+                <!-- Color options -->
+                <Button
+                    android:id="@+id/btnColorWarm"
+                    style="@style/Widget.App.Button.ColorOption"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:backgroundTint="@color/warm_light" />
+
+                <Button
+                    android:id="@+id/btnColorNeutral"
+                    style="@style/Widget.App.Button.ColorOption"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:backgroundTint="@color/neutral_light" />
+
+                <Button
+                    android:id="@+id/btnColorCool"
+                    style="@style/Widget.App.Button.ColorOption"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:backgroundTint="@color/cool_light" />
+
+                <Button
+                    android:id="@+id/btnColorRed"
+                    style="@style/Widget.App.Button.ColorOption"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:backgroundTint="@color/red_light" />
+
+                <Button
+                    android:id="@+id/btnColorBlue"
+                    style="@style/Widget.App.Button.ColorOption"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:backgroundTint="@color/blue_light" />
+
+                <Button
+                    android:id="@+id/btnColorGreen"
+                    style="@style/Widget.App.Button.ColorOption"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:backgroundTint="@color/green_light" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <!-- Usage chart -->
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/usageChart"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/colorSelectionGroup" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.motion.widget.MotionLayout>
 </com.google.android.material.card.MaterialCardView>

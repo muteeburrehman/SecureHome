@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#DDDDDD"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2z" />
+
+    <!-- Speaker body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M5,4v16h14V4H5zM12,17c-2.21,0 -4,-1.79 -4,-4s1.79,-4 4,-4 4,1.79 4,4 -1.79,4 -4,4z" />
+
+    <!-- Speaker cone -->
+    <path
+        android:fillColor="#BBBBBB"
+        android:pathData="M12,13m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0" />
+
+    <!-- Top control -->
+    <path
+        android:fillColor="#BBBBBB"
+        android:pathData="M12,7m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+
+    <!-- Muted indicator (slash) -->
+    <path
+        android:strokeColor="#888888"
+        android:strokeWidth="1.5"
+        android:pathData="M6,6L18,18" />
+</vector>
