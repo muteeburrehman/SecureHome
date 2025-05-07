@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,6 +80,8 @@ public class DeviceListActivity extends AppCompatActivity implements
             }
 
             setContentView(R.layout.activity_device_list);
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+
             initializeActivity();
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreate", e);
@@ -167,6 +170,9 @@ public class DeviceListActivity extends AppCompatActivity implements
         } else {
             tvHomeOwner.setText("Home");
         }
+
+        // Setup back button navigation
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 
     private void setupClickListeners() {

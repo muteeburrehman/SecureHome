@@ -5,41 +5,68 @@
     android:id="@+id/layoutRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor1">
+    android:background="@color/background">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
+        android:background="@color/colorPrimary"
         app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:contentInsetStartWithNavigation="0dp">
+            app:contentInsetStartWithNavigation="0dp"
+            app:navigationIcon="@drawable/ic_back_arrow">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/tvHomeOwner"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Smart Home"
-                    android:textColor="@color/text_primary"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Manage your smart devices"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/tvHomeOwner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Smart Home"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/mazzardhmediumitalic" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Manage your smart devices"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/mazzardhmedium"  />
+                </LinearLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    android:layout_marginEnd="@dimen/_15sdp"
+                    app:strokeWidth="0dp">
+
+                    <ImageView
+                        android:id="@+id/ivProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_profile_placeholder"
+                        android:contentDescription="Profile" />
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -54,38 +81,29 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp">
 
-            <!-- Device Stats Card with Improved Visuals -->
+            <!-- Device Stats Card with Modern Design -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/card_stroke">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <!-- Card Title -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingHorizontal="16dp"
-                        android:paddingTop="16dp"
-                        android:text="Device Status"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
                     <!-- Stats Row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
+                        android:orientation="horizontal">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -94,21 +112,31 @@
                             android:gravity="center"
                             android:orientation="vertical">
 
-                            <ImageView
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:layout_marginBottom="8dp"
-                                android:src="@drawable/ic_active_device"
-                                app:tint="@color/device_active" />
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_marginBottom="12dp"
+                                app:cardCornerRadius="16dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp"
+                                android:background="@color/icon_background">
+
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_active_device"
+                                    app:tint="@color/device_active" />
+                            </com.google.android.material.card.MaterialCardView>
 
                             <TextView
                                 android:id="@+id/tvActiveDevices"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
-                                android:textColor="@color/device_active"
+                                android:textColor="@color/text_primary"
                                 android:textSize="24sp"
-                                android:textStyle="bold" />
+                                android:fontFamily="sans-serif-medium" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -118,11 +146,6 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/divider_color" />
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -130,21 +153,31 @@
                             android:gravity="center"
                             android:orientation="vertical">
 
-                            <ImageView
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:layout_marginBottom="8dp"
-                                android:src="@drawable/ic_inactive_device"
-                                app:tint="@color/device_inactive" />
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_marginBottom="12dp"
+                                app:cardCornerRadius="16dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp"
+                                android:background="@color/icon_background">
+
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_inactive_device"
+                                    app:tint="@color/device_inactive" />
+                            </com.google.android.material.card.MaterialCardView>
 
                             <TextView
                                 android:id="@+id/tvInactiveDevices"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
-                                android:textColor="@color/device_inactive"
+                                android:textColor="@color/text_primary"
                                 android:textSize="24sp"
-                                android:textStyle="bold" />
+                                android:fontFamily="sans-serif-medium" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -154,11 +187,6 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/divider_color" />
-
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -166,21 +194,31 @@
                             android:gravity="center"
                             android:orientation="vertical">
 
-                            <ImageView
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:layout_marginBottom="8dp"
-                                android:src="@drawable/ic_scheduled_device"
-                                app:tint="@color/device_scheduled" />
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_marginBottom="12dp"
+                                app:cardCornerRadius="16dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp"
+                                android:background="@color/icon_background">
+
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_scheduled_device"
+                                    app:tint="@color/device_scheduled" />
+                            </com.google.android.material.card.MaterialCardView>
 
                             <TextView
                                 android:id="@+id/tvScheduledDevices"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
-                                android:textColor="@color/device_scheduled"
+                                android:textColor="@color/text_primary"
                                 android:textSize="24sp"
-                                android:textStyle="bold" />
+                                android:fontFamily="sans-serif-medium" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -193,11 +231,11 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Devices Header with Animation -->
+            <!-- Devices Header with Modern Design -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -207,24 +245,24 @@
                     android:layout_weight="1"
                     android:text="My Devices"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="20sp"
+                    android:fontFamily="@font/mazzardhmediumitalic" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddDevice"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minHeight="40dp"
+                    android:minHeight="44dp"
                     android:text="Add"
                     android:textAllCaps="false"
-                    android:textColor="@color/accent_color"
-                    app:cornerRadius="20dp"
+                    android:textColor="@color/primary"
+                    app:cornerRadius="22dp"
                     app:icon="@drawable/ic_add"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
-                    app:iconTint="@color/accent_color"
-                    app:strokeColor="@color/accent_color" />
+                    app:iconTint="@color/primary"
+                    app:strokeColor="@color/primary" />
             </LinearLayout>
 
             <!-- SwipeRefreshLayout and RecyclerView -->
@@ -245,7 +283,7 @@
                         android:clipToPadding="false"
                         android:paddingBottom="80dp" />
 
-                    <!-- Empty State with Animation -->
+                    <!-- Empty State with Modern Design -->
                     <LinearLayout
                         android:id="@+id/layoutEmptyState"
                         android:layout_width="match_parent"
@@ -255,9 +293,9 @@
                         android:visibility="gone">
 
                         <ImageView
-                            android:layout_width="160dp"
-                            android:layout_height="160dp"
-                            android:layout_marginBottom="24dp"
+                            android:layout_width="180dp"
+                            android:layout_height="180dp"
+                            android:layout_marginBottom="28dp"
                             android:contentDescription="Empty state illustration"
                             android:src="@drawable/illustration_empty_devices" />
 
@@ -268,13 +306,13 @@
                             android:gravity="center"
                             android:text="No devices yet"
                             android:textColor="@color/text_primary"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
+                            android:textSize="22sp"
+                            android:fontFamily="sans-serif-medium" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="32dp"
+                            android:layout_marginHorizontal="40dp"
                             android:layout_marginTop="8dp"
                             android:gravity="center"
                             android:text="Add your first smart device to start monitoring and controlling your home"
@@ -285,48 +323,52 @@
                             android:id="@+id/btnAddFirstDevice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="32dp"
-                            android:paddingHorizontal="32dp"
+                            android:layout_marginTop="36dp"
+                            android:paddingHorizontal="40dp"
                             android:paddingVertical="12dp"
                             android:text="Add Device"
                             android:textAllCaps="false"
                             android:textSize="16sp"
-                            app:cornerRadius="24dp"
-                            app:elevation="6dp" />
+                            app:cornerRadius="28dp"
+                            app:elevation="0dp"
+                            android:backgroundTint="@color/primary" />
                     </LinearLayout>
 
-                    <!-- Loading State with Animation -->
+                    <!-- Loading State -->
                     <FrameLayout
                         android:id="@+id/layoutLoadingState"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:visibility="gone">
 
-                        <ProgressBar
-                            android:id="@+id/progressBar"
-                            style="?android:attr/progressBarStyle"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/progressIndicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:indeterminateTint="@color/accent_color" />
+                            app:indicatorColor="@color/primary"
+                            app:trackColor="@color/icon_background"
+                            app:indicatorSize="48dp"
+                            app:trackThickness="4dp" />
                     </FrameLayout>
                 </FrameLayout>
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Enhanced FAB to add device -->
+    <!-- Modern FAB Design -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddDevice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
         android:contentDescription="Add Device"
         android:src="@drawable/ic_add"
-        app:backgroundTint="@color/accent_color"
+        app:backgroundTint="@color/primary"
         app:tint="@android:color/white"
         app:borderWidth="0dp"
-        app:elevation="8dp" />
+        app:elevation="4dp"
+        app:fabSize="normal" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

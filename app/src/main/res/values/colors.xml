@@ -72,8 +72,8 @@
     <color name="rippleColor">#33000000</color>          <!-- Semi-transparent black for ripples -->
     <color name="scrimColor">#52000000</color>           <!-- Semi-transparent black for overlays -->
 
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
+<!--    <color name="text_primary">#212121</color>-->
+<!--    <color name="text_secondary">#757575</color>-->
     <color name="text_hint">#BDBDBD</color>
     <color name="divider_color">#EEEEEE</color>
 
@@ -87,5 +87,29 @@
 
     <color name="device_on_color">#4CAF50</color> <!-- Green -->
     <color name="device_off_color">#F44336</color> <!-- Red -->
+
+
+    <!-- Base colors -->
+    <color name="primary">#5D5FEF</color>
+    <color name="primary_variant">#7879F1</color>
+    <color name="secondary">#03DAC5</color>
+    <color name="background">#F8F9FF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="error">#FF4C60</color>
+
+    <!-- Text colors -->
+    <color name="text_primary">#1E1F4B</color>
+    <color name="text_secondary">#6E7191</color>
+    <color name="text_tertiary">#A0A3BD</color>
+
+    <!-- Status colors -->
+<!--    <color name="device_active">#4CAF50</color>-->
+<!--    <color name="device_inactive">#9E9E9E</color>-->
+<!--    <color name="device_scheduled">#FF9800</color>-->
+
+    <!-- Additional colors -->
+    <color name="divider">#E6E8F0</color>
+    <color name="card_stroke">#E6E8F0</color>
+    <color name="icon_background">#F0F1FA</color>
 
 </resources>

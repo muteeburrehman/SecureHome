@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,11 +42,16 @@ public class DeviceScheduleActivity extends AppCompatActivity implements
     private int homeId;
     private int deviceId;
     private String deviceName;
+    private Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_schedule);
+
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+
 
         // Get device and home IDs from intent
         homeId = getIntent().getIntExtra("HOME_ID", -1);
@@ -73,6 +80,7 @@ public class DeviceScheduleActivity extends AppCompatActivity implements
 
         // Set device name text
         tvDeviceName.setText(String.format("Device: %s", deviceName));
+        toolbar = findViewById(R.id.toolbar);
 
         // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -84,6 +92,9 @@ public class DeviceScheduleActivity extends AppCompatActivity implements
 
         // Observe LiveData
         observeViewModel();
+
+        // Setup back button navigation
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         // Initial load
         scheduleRepository.fetchSchedules(homeId, deviceId);
