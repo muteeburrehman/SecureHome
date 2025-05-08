@@ -1,4 +1,3 @@
-// app/src/main/java/io/xconn/securehome/models/Device.java
 package io.xconn.securehome.models;
 
 import com.google.gson.annotations.SerializedName;
@@ -16,12 +15,31 @@ public class Device {
     @SerializedName("home_id")
     private int homeId;
 
+    @SerializedName("endpoint_index")
+    private int endpointIndex; // New field for endpoint index
+
+    // Default constructor
+    public Device() {
+    }
+
+    // Constructor with name and status
     public Device(String name, boolean status, int homeId) {
         this.name = name;
         this.status = status;
         this.homeId = homeId;
+        this.endpointIndex = -1; // Default to -1, will be set properly when device is added
     }
 
+    // Constructor with all fields
+    public Device(int id, String name, boolean status, int homeId, int endpointIndex) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.homeId = homeId;
+        this.endpointIndex = endpointIndex;
+    }
+
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -52,5 +70,13 @@ public class Device {
 
     public void setHomeId(int homeId) {
         this.homeId = homeId;
+    }
+
+    public int getEndpointIndex() {
+        return endpointIndex;
+    }
+
+    public void setEndpointIndex(int endpointIndex) {
+        this.endpointIndex = endpointIndex;
     }
 }

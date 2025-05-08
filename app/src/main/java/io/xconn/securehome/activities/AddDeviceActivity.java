@@ -17,6 +17,7 @@ import java.util.List;
 import io.xconn.securehome.R;
 import io.xconn.securehome.models.Device;
 import io.xconn.securehome.repository.DeviceRepository;
+import io.xconn.securehome.utils.Esp32EndpointManager;
 
 public class AddDeviceActivity extends AppCompatActivity implements DeviceRepository.OnDeviceAddedListener {
     private static final int MAX_DEVICES_ALLOWED = 23;
@@ -26,6 +27,7 @@ public class AddDeviceActivity extends AppCompatActivity implements DeviceReposi
     private Button btnAddDevice;
     private ProgressBar progressBar;
     private TextView tvHomeInfo;
+    private TextView tvEndpointInfo;  // New TextView to show endpoint info
     private DeviceRepository deviceRepository;
     private int homeId;
     private String homeOwner;
@@ -54,6 +56,7 @@ public class AddDeviceActivity extends AppCompatActivity implements DeviceReposi
         btnAddDevice = findViewById(R.id.btnAddDevice);
         progressBar = findViewById(R.id.progressBar);
         tvHomeInfo = findViewById(R.id.tvHomeInfo);
+        tvEndpointInfo = findViewById(R.id.tvEndpointInfo);  // Initialize the new TextView
 
         // Set home info text
         tvHomeInfo.setText(String.format("Adding device to: %s", homeOwner));
@@ -88,17 +91,28 @@ public class AddDeviceActivity extends AppCompatActivity implements DeviceReposi
         int deviceCount = devices != null ? devices.size() : 0;
 
         // Update the home info text to include device count
-//        if (tvHomeInfo != null) {
-//            tvHomeInfo.setText(String.format("Adding device to: %s (%d/%d devices)",
-//                    homeOwner, deviceCount, MAX_DEVICES_ALLOWED));
-//        }
+        if (tvHomeInfo != null) {
+            tvHomeInfo.setText(String.format("Adding device to: %s (%d/%d devices)",
+                    homeOwner, deviceCount, MAX_DEVICES_ALLOWED));
+        }
+
+        // Update endpoint info - show which endpoint will be used for the next device
+        if (tvEndpointInfo != null && deviceCount < MAX_DEVICES_ALLOWED) {
+            String onEndpoint = Esp32EndpointManager.getOnEndpoint(deviceCount);
+            String offEndpoint = Esp32EndpointManager.getOffEndpoint(deviceCount);
+            tvEndpointInfo.setText(String.format("This device will use endpoints: %s / %s",
+                    onEndpoint, offEndpoint));
+            tvEndpointInfo.setVisibility(View.VISIBLE);
+        } else if (tvEndpointInfo != null) {
+            tvEndpointInfo.setVisibility(View.GONE);
+        }
 
         // Disable add button if max devices reached
         if (deviceCount >= MAX_DEVICES_ALLOWED) {
             btnAddDevice.setEnabled(false);
             btnAddDevice.setText("Maximum Devices Reached");
             btnAddDevice.setTextColor(Color.WHITE);
-            Toast.makeText(this, "Maximum limit of 21 devices reached", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Maximum limit of " + MAX_DEVICES_ALLOWED + " devices reached", Toast.LENGTH_LONG).show();
         } else {
             btnAddDevice.setEnabled(true);
             btnAddDevice.setText("Add Device");
@@ -117,7 +131,7 @@ public class AddDeviceActivity extends AppCompatActivity implements DeviceReposi
 
         // Check device limit
         if (currentDevices != null && currentDevices.size() >= MAX_DEVICES_ALLOWED) {
-            Toast.makeText(this, "Cannot add more devices. Maximum limit of 21 devices reached.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Cannot add more devices. Maximum limit of " + MAX_DEVICES_ALLOWED + " devices reached.", Toast.LENGTH_LONG).show();
             return;
         }
 

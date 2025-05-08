@@ -12,6 +12,7 @@ import io.xconn.securehome.api.ApiService;
 import io.xconn.securehome.api.RetrofitClient;
 import io.xconn.securehome.api.request.DeviceStatusUpdateRequest;
 import io.xconn.securehome.models.Device;
+import io.xconn.securehome.utils.Esp32EndpointManager;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -89,6 +90,49 @@ public class DeviceRepository {
     public void addDevice(int homeId, Device device, OnDeviceAddedListener listener) {
         isLoadingLiveData.setValue(true);
 
+        // First, get the existing devices to determine the new device's endpoint index
+        apiService.getDevices(homeId).enqueue(new Callback<List<Device>>() {
+            @Override
+            public void onResponse(Call<List<Device>> call, Response<List<Device>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Device> existingDevices = response.body();
+
+                    // Assign the next available endpoint index (or default to 0 if empty)
+                    int newEndpointIndex = existingDevices.size();
+
+                    // Make sure we don't exceed our maximum number of endpoints
+                    if (newEndpointIndex >= 23) {
+                        isLoadingLiveData.setValue(false);
+                        String errorMessage = "Maximum number of devices reached (23). Cannot add more devices with unique endpoints.";
+                        errorMessageLiveData.setValue(errorMessage);
+                        listener.onError(errorMessage);
+                        return;
+                    }
+
+                    // Set the endpoint index for the new device
+                    device.setEndpointIndex(newEndpointIndex);
+
+                    // Now create the device with the endpoint index
+                    createDeviceWithEndpointIndex(homeId, device, listener);
+                } else {
+                    isLoadingLiveData.setValue(false);
+                    String errorMessage = "Failed to fetch existing devices: " + response.message();
+                    errorMessageLiveData.setValue(errorMessage);
+                    listener.onError(errorMessage);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Device>> call, Throwable t) {
+                isLoadingLiveData.setValue(false);
+                String errorMessage = "Network error: " + t.getMessage();
+                errorMessageLiveData.setValue(errorMessage);
+                listener.onError(errorMessage);
+            }
+        });
+    }
+
+    private void createDeviceWithEndpointIndex(int homeId, Device device, OnDeviceAddedListener listener) {
         apiService.createDevice(homeId, device).enqueue(new Callback<Device>() {
             @Override
             public void onResponse(Call<Device> call, Response<Device> response) {
@@ -102,7 +146,8 @@ public class DeviceRepository {
                     }
                     currentDeviceLiveData.setValue(newDevice);
                     listener.onDeviceAdded(newDevice);
-                    Log.d(TAG, "Device added successfully: " + newDevice.getName());
+                    Log.d(TAG, "Device added successfully: " + newDevice.getName() +
+                            " with endpoint index: " + newDevice.getEndpointIndex());
                 } else {
                     String errorMessage = "Failed to add device: " +
                             (response.errorBody() != null ? response.errorBody().toString() : response.message());
@@ -126,7 +171,30 @@ public class DeviceRepository {
     public void updateDeviceStatus(int homeId, int deviceId, boolean status, OnStatusUpdateListener listener) {
         isLoadingLiveData.setValue(true);
 
-        // First, make the request to update the device status
+        // Find the device to get its endpoint index
+        Device targetDevice = null;
+        List<Device> devices = devicesLiveData.getValue();
+        if (devices != null) {
+            for (Device device : devices) {
+                if (device.getId() == deviceId) {
+                    targetDevice = device;
+                    break;
+                }
+            }
+        }
+
+        if (targetDevice == null) {
+            isLoadingLiveData.setValue(false);
+            String errorMessage = "Device not found";
+            errorMessageLiveData.setValue(errorMessage);
+            listener.onError(errorMessage);
+            return;
+        }
+
+        // Store device reference for use in callbacks
+        final Device finalTargetDevice = targetDevice;
+
+        // First, make the request to update the device status in the backend
         DeviceStatusUpdateRequest request = new DeviceStatusUpdateRequest(status);
         apiService.updateDeviceStatus(homeId, deviceId, request).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -144,8 +212,8 @@ public class DeviceRepository {
                         devicesLiveData.setValue(currentDevices);
                     }
 
-                    // Now, send the corresponding ESP32 request based on the status
-                    sendEsp32Request(status, listener);
+                    // Now, send the corresponding ESP32 request based on the device's endpoint index
+                    sendEsp32Request(finalTargetDevice.getEndpointIndex(), status, listener);
                 } else {
                     isLoadingLiveData.setValue(false);
                     String errorMessage = "Failed to update device status: " + response.message();
@@ -166,9 +234,13 @@ public class DeviceRepository {
         });
     }
 
-    private void sendEsp32Request(boolean status, OnStatusUpdateListener listener) {
-        // Determine the endpoint based on the status
-        String endpoint = status ? "/GreenON" : "/GreenOFF";  // Remove the "/esp32" prefix
+    private void sendEsp32Request(int endpointIndex, boolean status, OnStatusUpdateListener listener) {
+        // Determine the endpoint based on the status and device's endpoint index
+        String endpoint = status ?
+                Esp32EndpointManager.getOnEndpoint(endpointIndex) :
+                Esp32EndpointManager.getOffEndpoint(endpointIndex);
+
+        Log.d(TAG, "Using ESP32 endpoint: " + endpoint + " for device with endpoint index: " + endpointIndex);
 
         // Make the request to the ESP32 endpoint using the ESP32-specific API service
         Call<ResponseBody> call = esp32ApiService.callEsp32Endpoint(endpoint);
@@ -180,7 +252,7 @@ public class DeviceRepository {
                     String statusMessage = "Device " + (status ? "turned ON" : "turned OFF") + " successfully";
                     statusUpdateMessageLiveData.setValue(statusMessage);
                     listener.onStatusUpdated(statusMessage);
-                    Log.d(TAG, statusMessage + " (ESP32 notified)");
+                    Log.d(TAG, statusMessage + " (ESP32 notified using endpoint: " + endpoint + ")");
                 } else {
                     String errorMessage = "Device status changed but failed to notify ESP32: " + response.message();
                     errorMessageLiveData.setValue(errorMessage);
