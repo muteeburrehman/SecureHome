@@ -112,6 +112,11 @@ public class DeviceRepository {
                     // Set the endpoint index for the new device
                     device.setEndpointIndex(newEndpointIndex);
 
+                    Log.d(TAG, "Creating new device with endpoint index: " + newEndpointIndex);
+                    String onEndpoint = Esp32EndpointManager.getOnEndpoint(newEndpointIndex);
+                    String offEndpoint = Esp32EndpointManager.getOffEndpoint(newEndpointIndex);
+                    Log.d(TAG, "This device will use endpoints: " + onEndpoint + " / " + offEndpoint);
+
                     // Now create the device with the endpoint index
                     createDeviceWithEndpointIndex(homeId, device, listener);
                 } else {
@@ -139,6 +144,13 @@ public class DeviceRepository {
                 isLoadingLiveData.setValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     Device newDevice = response.body();
+
+                    // Ensure the endpoint index is preserved from our local device object
+                    // This is crucial if the server doesn't return the endpoint_index field
+                    if (newDevice.getEndpointIndex() <= 0) {
+                        newDevice.setEndpointIndex(device.getEndpointIndex());
+                    }
+
                     List<Device> currentDevices = devicesLiveData.getValue();
                     if (currentDevices != null) {
                         currentDevices.add(newDevice);
@@ -212,8 +224,11 @@ public class DeviceRepository {
                         devicesLiveData.setValue(currentDevices);
                     }
 
+                    int endpointIndex = finalTargetDevice.getEndpointIndex();
+                    Log.d(TAG, "Using endpoint index: " + endpointIndex + " for device: " + finalTargetDevice.getName());
+
                     // Now, send the corresponding ESP32 request based on the device's endpoint index
-                    sendEsp32Request(finalTargetDevice.getEndpointIndex(), status, listener);
+                    sendEsp32Request(endpointIndex, status, listener);
                 } else {
                     isLoadingLiveData.setValue(false);
                     String errorMessage = "Failed to update device status: " + response.message();

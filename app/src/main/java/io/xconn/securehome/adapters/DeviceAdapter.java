@@ -16,10 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.github.angads25.toggle.widget.LabeledSwitch;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.slider.Slider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +60,6 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
     public interface OnDeviceListener {
         void onDeviceToggle(Device device, boolean newStatus);
         void onDeviceSchedule(Device device);
-        void onDeviceFavorite(Device device, boolean isFavorite);
-        void onDeviceSettings(Device device);
     }
 
     static class DeviceViewHolder extends RecyclerView.ViewHolder {
@@ -82,16 +78,10 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
         // Control components
         private final LabeledSwitch interactiveSwitch;
         private final MaterialButton btnSchedule;
-        private final MaterialButton btnFavorite;
-        private final MaterialButton btnSettings;
-        private final MaterialButtonToggleGroup deviceQuickActions;
-
-        // Removed usage stats container, tvUsageStat, and ivUsageIndicator
 
         // Expanded content (may be null if not in expanded layout)
         private final View expandedContentLayout;
-        private final Slider brightnessSlider;
-        private final MaterialButtonToggleGroup colorSelectionGroup;
+        private final View colorSelectionGroup;
 
         public DeviceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -111,15 +101,9 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             // Control components
             interactiveSwitch = itemView.findViewById(R.id.interactiveSwitch);
             btnSchedule = itemView.findViewById(R.id.btnSchedule);
-            btnFavorite = itemView.findViewById(R.id.btnFavorite);
-            btnSettings = itemView.findViewById(R.id.btnSettings);
-            deviceQuickActions = itemView.findViewById(R.id.deviceQuickActions);
-
-            // Removed usage stats references
 
             // Expanded content (optional)
             expandedContentLayout = itemView.findViewById(R.id.expandedContentLayout);
-            brightnessSlider = itemView.findViewById(R.id.brightnessSlider);
             colorSelectionGroup = itemView.findViewById(R.id.colorSelectionGroup);
         }
 
@@ -163,10 +147,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
                 listener.onDeviceToggle(device, isChecked);
             });
 
-            // Set up quick action buttons
+            // Set up schedule button
             btnSchedule.setOnClickListener(v -> listener.onDeviceSchedule(device));
-            btnFavorite.setOnClickListener(v -> listener.onDeviceFavorite(device, !btnFavorite.isChecked()));
-            btnSettings.setOnClickListener(v -> listener.onDeviceSettings(device));
 
             // Set up card expansion behavior
             if (deviceCardMotionLayout != null) {
@@ -198,28 +180,15 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
                 });
             }
 
-            // Removed usage stats setup
-
-            // Set up expanded controls if available
-            if (brightnessSlider != null) {
-                brightnessSlider.setValue(isOn ? 80f : 0f); // Default value
-                brightnessSlider.addOnChangeListener((slider, value, fromUser) -> {
-                    if (fromUser && value > 0 && !device.isStatus()) {
-                        // If slider is moved and device was off, turn it on
-                        listener.onDeviceToggle(device, true);
-                    } else if (fromUser && value == 0 && device.isStatus()) {
-                        // If slider is set to 0 and device was on, turn it off
-                        listener.onDeviceToggle(device, false);
-                    }
-                });
-            }
-
             // Set default color selection if available
-            if (colorSelectionGroup != null) {
+            if (colorSelectionGroup != null && colorSelectionGroup instanceof ViewGroup) {
+                ViewGroup colorGroup = (ViewGroup) colorSelectionGroup;
                 // Select default color based on device type or status
-                Button defaultColorButton = (Button) colorSelectionGroup.getChildAt(isOn ? 0 : 2);
-                if (defaultColorButton != null) {
-                    defaultColorButton.performClick();
+                if (colorGroup.getChildCount() > 0) {
+                    Button defaultColorButton = (Button) colorGroup.getChildAt(isOn ? 0 : 2);
+                    if (defaultColorButton != null) {
+                        defaultColorButton.performClick();
+                    }
                 }
             }
         }

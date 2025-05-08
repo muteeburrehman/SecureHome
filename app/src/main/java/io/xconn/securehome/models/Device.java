@@ -1,8 +1,11 @@
 package io.xconn.securehome.models;
 
 import com.google.gson.annotations.SerializedName;
+import android.util.Log;
 
 public class Device {
+    private static final String TAG = "Device";
+
     @SerializedName("id")
     private int id;
 
@@ -20,6 +23,7 @@ public class Device {
 
     // Default constructor
     public Device() {
+        this.endpointIndex = -1;
     }
 
     // Constructor with name and status
@@ -77,6 +81,18 @@ public class Device {
     }
 
     public void setEndpointIndex(int endpointIndex) {
+        Log.d(TAG, "Setting endpoint index for device " + name + " to: " + endpointIndex);
         this.endpointIndex = endpointIndex;
+    }
+
+    @Override
+    public String toString() {
+        return "Device{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                ", homeId=" + homeId +
+                ", endpointIndex=" + endpointIndex +
+                '}';
     }
 }

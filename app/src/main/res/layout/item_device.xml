@@ -119,76 +119,28 @@
                 app:layout_constraintTop_toBottomOf="@+id/tvDeviceType"
                 tools:text="ON" />
 
-            <!-- Quick action buttons row -->
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/deviceQuickActions"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <!-- Quick action buttons row - MODIFIED to show only schedule button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSchedule"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_marginTop="8dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:icon="@drawable/ic_schedule"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@color/accent_color"
+                app:strokeColor="@color/accent_color"
+                app:strokeWidth="1dp"
+                app:cornerRadius="18dp"
+                android:contentDescription="Schedule"
                 app:layout_constraintStart_toStartOf="@id/chipDeviceStatus"
-                app:layout_constraintTop_toBottomOf="@id/chipDeviceStatus"
-                app:singleSelection="false"
-                app:selectionRequired="false">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSchedule"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    android:layout_marginEnd="8dp"
-                    app:icon="@drawable/ic_schedule"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconTint="@color/accent_color"
-                    app:strokeColor="@color/accent_color"
-                    app:strokeWidth="1dp"
-                    app:cornerRadius="18dp"
-                    android:contentDescription="Schedule" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnFavorite"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    android:layout_marginEnd="8dp"
-                    app:icon="@drawable/ic_favorite"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconTint="@color/accent_color"
-                    app:strokeColor="@color/accent_color"
-                    app:strokeWidth="1dp"
-                    app:cornerRadius="18dp"
-                    android:contentDescription="Favorite" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSettings"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:insetLeft="0dp"
-                    android:insetTop="0dp"
-                    android:insetRight="0dp"
-                    android:insetBottom="0dp"
-                    android:padding="0dp"
-                    app:icon="@drawable/ic_settings"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconTint="@color/accent_color"
-                    app:strokeColor="@color/accent_color"
-                    app:strokeWidth="1dp"
-                    app:cornerRadius="18dp"
-                    android:contentDescription="Settings" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
+                app:layout_constraintTop_toBottomOf="@id/chipDeviceStatus" />
 
             <!-- Modern interactive switch -->
             <com.github.angads25.toggle.widget.LabeledSwitch
@@ -204,10 +156,9 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
-            <!-- Removed usage statistics container -->
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Expandable details section -->
+        <!-- Expandable details section with only color selection -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/expandedContentLayout"
             android:layout_width="match_parent"
@@ -216,42 +167,17 @@
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/mainContentLayout">
 
-            <!-- Device controls (will appear when expanded) -->
-            <com.google.android.material.slider.Slider
-                android:id="@+id/brightnessSlider"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginHorizontal="8dp"
-                app:thumbColor="@color/accent_color"
-                app:trackColorActive="@color/accent_color"
-                app:trackColorInactive="@color/slider_inactive"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tvSliderLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Brightness"
-                android:textSize="12sp"
-                android:fontFamily="@font/mazzardhlight"
-                android:textColor="@color/text_tertiary"
-                app:layout_constraintStart_toStartOf="@id/brightnessSlider"
-                app:layout_constraintTop_toBottomOf="@id/brightnessSlider" />
-
             <!-- Color selection for lights -->
             <com.google.android.material.button.MaterialButtonToggleGroup
                 android:id="@+id/colorSelectionGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 app:singleSelection="true"
                 app:selectionRequired="true"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvSliderLabel">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <!-- Color options -->
                 <Button
@@ -296,16 +222,6 @@
                     android:layout_height="32dp"
                     android:backgroundTint="@color/green_light" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
-
-            <!-- Usage chart -->
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/usageChart"
-                android:layout_width="0dp"
-                android:layout_height="100dp"
-                android:layout_marginTop="16dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/colorSelectionGroup" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.motion.widget.MotionLayout>
 </com.google.android.material.card.MaterialCardView>

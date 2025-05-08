@@ -6,7 +6,7 @@ package io.xconn.securehome.utils;
 public class Esp32EndpointManager {
     // Array of available device endpoint pairs (ON/OFF)
     private static final String[][] DEVICE_ENDPOINTS = {
-            {"/GreenON", "/GreenOFF"},           // Default/first device
+            {"/unlock","/lock"},           // Default/first device
             {"/RedON", "/RedOFF"},               // Second device
             {"/BlueON", "/BlueOFF"},             // Third device
             {"/YellowON", "/YellowOFF"},         // Fourth device
