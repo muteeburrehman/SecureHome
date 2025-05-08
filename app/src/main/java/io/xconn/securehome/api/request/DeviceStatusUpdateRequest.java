@@ -2,6 +2,9 @@ package io.xconn.securehome.api.request;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Request class for updating device status
+ */
 public class DeviceStatusUpdateRequest {
     @SerializedName("status")
     private boolean status;

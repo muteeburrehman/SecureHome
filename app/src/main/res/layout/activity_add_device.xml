@@ -106,6 +106,28 @@
                             android:textColor="#37474F"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Device Type Spinner -->
+                    <TextView
+                        android:id="@+id/tvDeviceTypeLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Device Type"
+                        android:textSize="16sp"
+                        android:textColor="#37474F"
+                        android:layout_marginTop="24dp"
+                        app:layout_constraintTop_toBottomOf="@id/tilDeviceName"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <Spinner
+                        android:id="@+id/spinnerDeviceType"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/spinner_background"
+                        app:layout_constraintTop_toBottomOf="@id/tvDeviceTypeLabel"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
                     <!-- Added TextView for Endpoint Info -->
                     <TextView
                         android:id="@+id/tvEndpointInfo"
@@ -115,7 +137,7 @@
                         android:textSize="14sp"
                         android:textColor="#78909C"
                         android:layout_marginTop="8dp"
-                        app:layout_constraintTop_toBottomOf="@id/tilDeviceName"
+                        app:layout_constraintTop_toBottomOf="@id/spinnerDeviceType"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"/>
 

@@ -6,29 +6,30 @@ package io.xconn.securehome.utils;
 public class Esp32EndpointManager {
     // Array of available device endpoint pairs (ON/OFF)
     private static final String[][] DEVICE_ENDPOINTS = {
-            {"/unlock","/lock"},           // Default/first device
-            {"/RedON", "/RedOFF"},               // Second device
-            {"/BlueON", "/BlueOFF"},             // Third device
-            {"/YellowON", "/YellowOFF"},         // Fourth device
-            {"/PurpleON", "/PurpleOFF"},         // Fifth device
-            {"/OrangeON", "/OrangeOFF"},         // Sixth device
-            {"/WhiteON", "/WhiteOFF"},           // Seventh device
-            {"/BlackON", "/BlackOFF"},           // Eighth device
-            {"/CyanON", "/CyanOFF"},             // Ninth device
-            {"/MagentaON", "/MagentaOFF"},       // Tenth device
-            {"/BrownON", "/BrownOFF"},           // 11th device
-            {"/GrayON", "/GrayOFF"},             // 12th device
-            {"/PinkON", "/PinkOFF"},             // 13th device
-            {"/LimeON", "/LimeOFF"},             // 14th device
-            {"/TealON", "/TealOFF"},             // 15th device
-            {"/NavyON", "/NavyOFF"},             // 16th device
-            {"/SilverON", "/SilverOFF"},         // 17th device
-            {"/GoldON", "/GoldOFF"},             // 18th device
-            {"/DeviceAON", "/DeviceAOFF"},       // 19th device
-            {"/DeviceBON", "/DeviceBOFF"},       // 20th device
-            {"/DeviceCON", "/DeviceCOFF"},       // 21st device
-            {"/DeviceDON", "/DeviceDOFF"},       // 22nd device
-            {"/DeviceEON", "/DeviceEOFF"}        // 23rd device
+            {"/D1ON", "/D1OFF"},           // 1st device
+            {"/D2ON", "/D2OFF"},           // 2nd device
+            {"/D3ON", "/D3OFF"},           // 3rd device
+            {"/D4ON", "/D4OFF"},           // 4th device
+            {"/D5ON", "/D5OFF"},           // 5th device
+            {"/D6ON", "/D6OFF"},           // 6th device
+            {"/D7ON", "/D7OFF"},           // 7th device
+            {"/D8ON", "/D8OFF"},           // 8th device
+            {"/D9ON", "/D9OFF"},           // 9th device
+            {"/D10ON", "/D10OFF"},         // 10th device
+            {"/D11ON", "/D11OFF"},         // 11th device
+            {"/D12ON", "/D12OFF"},         // 12th device
+            {"/D13ON", "/D13OFF"},         // 13th device
+            {"/D14ON", "/D14OFF"},         // 14th device
+            {"/D15ON", "/D15OFF"},         // 15th device
+            {"/D16ON", "/D16OFF"},         // 16th device
+            {"/D17ON", "/D17OFF"},         // 17th device
+            {"/D18ON", "/D18OFF"},         // 18th device
+            {"/D19ON", "/D19OFF"},         // 19th device
+            {"/D20ON", "/D20OFF"},         // 20th device
+            {"/D21ON", "/D21OFF"},         // 21st device
+            {"/D22ON", "/D22OFF"},         // 22nd device
+            {"/D23ON", "/D23OFF"}          // 23rd device
+
     };
 
     /**
