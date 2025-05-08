@@ -204,33 +204,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
-            <!-- Dynamic usage statistics -->
-            <LinearLayout
-                android:id="@+id/usageStatsContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/interactiveSwitch">
-
-                <TextView
-                    android:id="@+id/tvUsageStat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_secondary"
-                    android:fontFamily="@font/mazzardhregular"
-                    tools:text="8.2 kWh" />
-
-                <ImageView
-                    android:id="@+id/ivUsageIndicator"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginStart="4dp"
-                    android:src="@drawable/ic_trend_up"
-                    android:contentDescription="Usage Trend" />
-            </LinearLayout>
+            <!-- Removed usage statistics container -->
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Expandable details section -->

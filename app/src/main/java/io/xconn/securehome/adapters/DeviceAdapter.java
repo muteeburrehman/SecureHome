@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -87,10 +86,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
         private final MaterialButton btnSettings;
         private final MaterialButtonToggleGroup deviceQuickActions;
 
-        // Usage stats
-        private final LinearLayout usageStatsContainer;
-        private final TextView tvUsageStat;
-        private final ImageView ivUsageIndicator;
+        // Removed usage stats container, tvUsageStat, and ivUsageIndicator
 
         // Expanded content (may be null if not in expanded layout)
         private final View expandedContentLayout;
@@ -119,10 +115,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
             btnSettings = itemView.findViewById(R.id.btnSettings);
             deviceQuickActions = itemView.findViewById(R.id.deviceQuickActions);
 
-            // Usage stats
-            usageStatsContainer = itemView.findViewById(R.id.usageStatsContainer);
-            tvUsageStat = itemView.findViewById(R.id.tvUsageStat);
-            ivUsageIndicator = itemView.findViewById(R.id.ivUsageIndicator);
+            // Removed usage stats references
 
             // Expanded content (optional)
             expandedContentLayout = itemView.findViewById(R.id.expandedContentLayout);
@@ -205,16 +198,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceView
                 });
             }
 
-            // Set up usage stats (mock data for now)
-            if (usageStatsContainer != null) {
-                String usageValue = isOn ? "8.2 kWh" : "0 kWh";
-                tvUsageStat.setText(usageValue);
-                ivUsageIndicator.setImageResource(isOn ? R.drawable.ic_trend_up : R.drawable.ic_trend_down);
-                ivUsageIndicator.setColorFilter(
-                        ContextCompat.getColor(itemView.getContext(),
-                                isOn ? R.color.device_active : R.color.device_inactive)
-                );
-            }
+            // Removed usage stats setup
 
             // Set up expanded controls if available
             if (brightnessSlider != null) {
