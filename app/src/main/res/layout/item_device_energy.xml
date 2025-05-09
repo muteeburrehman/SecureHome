@@ -40,6 +40,18 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tvDeviceType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="Device Type"
+            android:textSize="14sp"
+            android:textColor="@color/dark_gray"
+            app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
+            app:layout_constraintTop_toBottomOf="@+id/tvDeviceName" />
+
+        <TextView
             android:id="@+id/tvPowerLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,7 +61,7 @@
             android:textSize="14sp"
             android:textColor="@color/dark_gray"
             app:layout_constraintStart_toEndOf="@+id/ivDeviceIcon"
-            app:layout_constraintTop_toBottomOf="@+id/tvDeviceName" />
+            app:layout_constraintTop_toBottomOf="@+id/tvDeviceType" />
 
         <TextView
             android:id="@+id/tvPower"
@@ -64,6 +76,19 @@
             app:layout_constraintBottom_toBottomOf="@+id/tvPowerLabel" />
 
         <TextView
+            android:id="@+id/tvWattage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="0 W"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@+id/tvPowerLabel"
+            app:layout_constraintTop_toTopOf="@+id/tvPowerLabel"
+            app:layout_constraintBottom_toBottomOf="@+id/tvPowerLabel" />
+
+        <TextView
             android:id="@+id/tvVoltageLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,7 +98,7 @@
             android:textSize="14sp"
             android:textColor="@color/dark_gray"
             app:layout_constraintStart_toEndOf="@+id/tvPower"
-            app:layout_constraintTop_toBottomOf="@+id/tvDeviceName" />
+            app:layout_constraintTop_toBottomOf="@+id/tvDeviceType" />
 
         <TextView
             android:id="@+id/tvVoltage"

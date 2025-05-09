@@ -16,6 +16,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -72,12 +73,15 @@ public class DeviceEnergyMonitoringActivity extends AppCompatActivity
     private DeviceEnergyAdapter deviceEnergyAdapter;
 
     private int selectedHomeId = -1;
+    private boolean isMonitoringActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_energy_monitoring);
+        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+
 
         // Initialize API
         apiService = RetrofitClient.getInstance(this).getApi();
@@ -212,6 +216,12 @@ public class DeviceEnergyMonitoringActivity extends AppCompatActivity
         spinnerHomes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Stop existing monitoring if active
+                if (selectedHomeId != -1 && isMonitoringActive) {
+                    energyService.stopRealTimeMonitoring(selectedHomeId);
+                    isMonitoringActive = false;
+                }
+
                 selectedHomeId = homes.get(position).getId();
                 loadDevicesForHome(selectedHomeId);
             }
@@ -248,30 +258,49 @@ public class DeviceEnergyMonitoringActivity extends AppCompatActivity
 
     private void generateInitialEnergyData() {
         // Generate initial energy data for devices
-        deviceEnergyList = energyService.generateEnergyDataForDevices(selectedHomeId, devices);
+        deviceEnergyList.clear(); // Clear existing data first
+        deviceEnergyList.addAll(energyService.generateEnergyDataForDevices(selectedHomeId, devices));
 
         // Update the adapter with new data
-        deviceEnergyAdapter = new DeviceEnergyAdapter(deviceEnergyList);
-        recyclerDevices.setAdapter(deviceEnergyAdapter);
+        deviceEnergyAdapter.notifyDataSetChanged();
 
         // Calculate and display total metrics
         updateTotalMetrics();
+
+        // Reset chart
+        resetChart();
 
         // Initialize chart with first data point
         addDataPointToChart();
     }
 
+    private void resetChart() {
+        // Clear existing data
+        xAxisValue = 0;
+        xAxisLabels.clear();
+
+        LineData data = new LineData();
+        chartEnergyUsage.setData(data);
+        chartEnergyUsage.invalidate();
+    }
+
     private void startRealTimeMonitoring() {
         // Stop any previous monitoring
-        energyService.stopRealTimeMonitoring(selectedHomeId);
+        if (isMonitoringActive) {
+            energyService.stopRealTimeMonitoring(selectedHomeId);
+        }
 
         // Start monitoring for the selected home
         energyService.startRealTimeMonitoring(selectedHomeId, this);
+        isMonitoringActive = true;
+
+        Log.d(TAG, "Started real-time monitoring for home ID: " + selectedHomeId);
     }
 
     private void refreshEnergyData() {
         if (selectedHomeId != -1) {
-            deviceEnergyList = energyService.refreshEnergyData(selectedHomeId);
+            deviceEnergyList.clear(); // Clear existing data first
+            deviceEnergyList.addAll(energyService.refreshEnergyData(selectedHomeId));
             deviceEnergyAdapter.notifyDataSetChanged();
             addDataPointToChart();
             updateTotalMetrics();
@@ -285,9 +314,9 @@ public class DeviceEnergyMonitoringActivity extends AppCompatActivity
         double totalUnits = metrics.get("totalUnits");
         double totalCost = metrics.get("totalCost");
 
-        tvTotalWattage.setText(String.format("Total Power: %.1f W", totalWattage));
-        tvTotalEnergy.setText(String.format("Total Consumption: %.2f kWh", totalUnits));
-        tvTotalCost.setText(String.format("Estimated Cost: $%.2f", totalCost));
+        tvTotalWattage.setText(String.format(Locale.US, "Total Power: %.1f W", totalWattage));
+        tvTotalEnergy.setText(String.format(Locale.US, "Total Consumption: %.2f kWh", totalUnits));
+        tvTotalCost.setText(String.format(Locale.US, "Estimated Cost: $%.2f", totalCost));
     }
 
     private void addDataPointToChart() {
@@ -355,8 +384,10 @@ public class DeviceEnergyMonitoringActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        if (selectedHomeId != -1) {
+        if (selectedHomeId != -1 && isMonitoringActive) {
+            Log.d(TAG, "onPause: Stopping real-time monitoring");
             energyService.stopRealTimeMonitoring(selectedHomeId);
+            isMonitoringActive = false;
         }
     }
 
@@ -364,16 +395,20 @@ public class DeviceEnergyMonitoringActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         if (selectedHomeId != -1) {
+            Log.d(TAG, "onResume: Resuming real-time monitoring");
             energyService.startRealTimeMonitoring(selectedHomeId, this);
+            isMonitoringActive = true;
         }
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-        if (selectedHomeId != -1) {
+        Log.d(TAG, "onDestroy: Cleaning up resources");
+        if (selectedHomeId != -1 && isMonitoringActive) {
             energyService.stopRealTimeMonitoring(selectedHomeId);
+            isMonitoringActive = false;
         }
+        super.onDestroy();
     }
 
     @Override
@@ -382,15 +417,18 @@ public class DeviceEnergyMonitoringActivity extends AppCompatActivity
                                     double totalUnits,
                                     double totalCost) {
         runOnUiThread(() -> {
+            Log.d(TAG, "Energy data updated - devices: " + updatedDevices.size() +
+                    ", totalWattage: " + totalWattage);
+
             // Update device list
             deviceEnergyList.clear();
             deviceEnergyList.addAll(updatedDevices);
             deviceEnergyAdapter.notifyDataSetChanged();
 
             // Update total metrics
-            tvTotalWattage.setText(String.format("Total Power: %.1f W", totalWattage));
-            tvTotalEnergy.setText(String.format("Total Consumption: %.2f kWh", totalUnits));
-            tvTotalCost.setText(String.format("Estimated Cost: $%.2f", totalCost));
+            tvTotalWattage.setText(String.format(Locale.US, "Total Power: %.1f W", totalWattage));
+            tvTotalEnergy.setText(String.format(Locale.US, "Total Consumption: %.2f kWh", totalUnits));
+            tvTotalCost.setText(String.format(Locale.US, "Estimated Cost: $%.2f", totalCost));
 
             // Add new data point to chart
             addDataPointToChart();
