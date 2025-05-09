@@ -12,8 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.xconn.securehome.activities.EnergyMonitoringActivity;
-import pl.droidsonroids.gif.GifImageView;
+import io.xconn.securehome.activities.DeviceEnergyMonitoringActivity;
+
 import com.google.android.material.card.MaterialCardView;
 import io.xconn.securehome.R;
 
@@ -142,7 +142,7 @@ public class DashboardFragment extends Fragment {
     }
 
     private void openEnergyAnalyticsView() {
-        Intent intent = new Intent(getActivity(), EnergyMonitoringActivity.class);
+        Intent intent = new Intent(getActivity(), DeviceEnergyMonitoringActivity.class);
         startActivity(intent);
         if (getActivity() != null) {
             getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

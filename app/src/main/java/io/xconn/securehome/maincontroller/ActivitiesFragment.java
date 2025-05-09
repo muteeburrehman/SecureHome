@@ -7,14 +7,10 @@ import androidx.cardview.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import io.xconn.securehome.R;
-import io.xconn.securehome.activities.EnergyMonitoringActivity;
+import io.xconn.securehome.activities.DeviceEnergyMonitoringActivity;
 import io.xconn.securehome.activities.FaceRegister;
-import io.xconn.securehome.activities.RecognitionActivity;
-import io.xconn.securehome.activities.RegisterActivity;
-import io.xconn.securehome.activities.RegistrationActivity;
 
 /**
  * Activities Fragment displays various activity options for the smart home system,
@@ -67,7 +63,7 @@ public class ActivitiesFragment extends Fragment {
         // Energy Monitoring card click
         energyMonitoringCard.setOnClickListener(v -> {
             // Launch Energy Monitoring activity or dialog
-            Intent energyIntent = new Intent(getActivity(), EnergyMonitoringActivity.class);
+            Intent energyIntent = new Intent(getActivity(), DeviceEnergyMonitoringActivity.class);
             startActivity(energyIntent);
         });
 

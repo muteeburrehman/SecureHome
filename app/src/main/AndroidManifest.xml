@@ -73,7 +73,7 @@
             android:name=".activities.FaceRegister"
             android:exported="false" />
         <activity
-            android:name=".activities.EnergyMonitoringActivity"
+            android:name=".activities.DeviceEnergyMonitoringActivity"
             android:exported="false" /> <!-- Other activities -->
         <activity
             android:name=".maincontroller.BottomNavBarActivity"

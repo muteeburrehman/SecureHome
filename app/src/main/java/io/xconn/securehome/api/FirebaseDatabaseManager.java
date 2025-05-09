@@ -19,7 +19,7 @@ public class FirebaseDatabaseManager {
     private FirebaseFirestore db;
 
     private static final String USERS_COLLECTION = "users";
-    private static final String ADMIN_EMAIL = "admin@securehome.com"; // Default admin email
+    private static final String ADMIN_EMAIL = "muteeb285@gmail.com"; // Default admin email
 
     private FirebaseDatabaseManager() {
         db = FirebaseFirestore.getInstance();
