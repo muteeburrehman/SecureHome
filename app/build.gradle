@@ -70,4 +70,10 @@ dependencies {
 
     implementation libs.toggle
 
+    implementation libs.firebase.messaging
+
+    implementation libs.android.mail
+    implementation libs.android.activation
+
+
 }

@@ -1,9 +1,11 @@
 [versions]
 agp = "8.5.0"
 androidGifDrawable = "1.2.25"
+androidMail = "1.6.7"
 firebaseAuth = "23.2.0"
 firebaseBom = "33.12.0"
 firebaseCore = "22.0.0"
+firebaseMessaging = "24.1.1"
 glide = "4.16.0"
 graphview = "4.2.2"
 junit = "4.13.2"
@@ -31,8 +33,10 @@ firebaseFirestore = "25.1.4"
 toggle = "1.1.0"
 
 [libraries]
+android-activation = { module = "com.sun.mail:android-activation", version.ref = "androidMail" }
 android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "androidGifDrawable" }
 
+android-mail = { module = "com.sun.mail:android-mail", version.ref = "androidMail" }
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
@@ -41,6 +45,7 @@ firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-core = { module = "com.google.firebase:firebase-core", version.ref = "firebaseCore" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 
 graphview = { module = "com.jjoe64:graphview", version.ref = "graphview" }
