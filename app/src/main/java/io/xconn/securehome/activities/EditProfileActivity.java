@@ -27,7 +27,7 @@ public class EditProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
-        authManager = FirebaseAuthManager.getInstance();
+        authManager = FirebaseAuthManager.getInstance(this);
 
         // If user is not logged in, go back to login activity
         if (!authManager.isUserLoggedIn()) {

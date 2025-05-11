@@ -15,6 +15,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+
     }
 
     buildTypes {
@@ -27,10 +29,16 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    // Updated packagingOptions block to exclude both LICENSE.md and NOTICE.md
+    packagingOptions {
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/NOTICE.md'
+    }
 }
 
 dependencies {
-
+    // Your existing dependencies remain unchanged
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity
@@ -47,7 +55,7 @@ dependencies {
     implementation libs.okhttp
     implementation libs.converter.scalars
     implementation libs.converter.moshi
-    implementation libs.logging.interceptor  // add this for logging
+    implementation libs.logging.interceptor
 
     implementation libs.glide
     annotationProcessor libs.compiler
@@ -75,5 +83,5 @@ dependencies {
     implementation libs.android.mail
     implementation libs.android.activation
 
-
+    implementation libs.firebase.functions
 }

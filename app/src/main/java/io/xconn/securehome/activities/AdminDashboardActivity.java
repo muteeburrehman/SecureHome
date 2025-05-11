@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,8 @@ import io.xconn.securehome.R;
 import io.xconn.securehome.adapters.UserAdapter;
 import io.xconn.securehome.api.FirebaseDatabaseManager;
 import io.xconn.securehome.models.UserModel;
+import io.xconn.securehome.services.EmailService;
+import io.xconn.securehome.services.NotificationService;
 
 public class AdminDashboardActivity extends AppCompatActivity implements UserAdapter.OnUserActionListener {
 
@@ -216,6 +219,13 @@ public class AdminDashboardActivity extends AppCompatActivity implements UserAda
                 user.setApprovalStatus(UserModel.STATUS_APPROVED);
                 userAdapter.updateUserStatus(position, UserModel.STATUS_APPROVED);
 
+                // Send approval notification via FCM
+                NotificationService.sendApprovalNotificationToUser(user.getUserId(), user.getDisplayName());
+
+                // Send approval email
+                EmailService emailService = new EmailService(this);
+                emailService.sendApprovalNotificationToUser(user.getEmail(), user.getDisplayName());
+
                 Toast.makeText(this, "User approved successfully", Toast.LENGTH_SHORT).show();
 
                 // If we're in the pending tab, refresh to show accurate list
@@ -230,8 +240,26 @@ public class AdminDashboardActivity extends AppCompatActivity implements UserAda
         });
     }
 
+
     @Override
     public void onRejectClick(UserModel user, int position) {
+        // Show dialog to get rejection reason
+        final EditText reasonInput = new EditText(this);
+        reasonInput.setHint("Reason for rejection (optional)");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Reject User")
+                .setMessage("Please provide a reason for rejection (optional):")
+                .setView(reasonInput)
+                .setPositiveButton("Reject", (dialog, which) -> {
+                    String reason = reasonInput.getText().toString().trim();
+                    performUserRejection(user, position, reason);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void performUserRejection(UserModel user, int position, String reason) {
         showLoading(true);
         dbManager.updateUserApprovalStatus(user.getUserId(), UserModel.STATUS_REJECTED, task -> {
             showLoading(false);
@@ -239,6 +267,13 @@ public class AdminDashboardActivity extends AppCompatActivity implements UserAda
                 // Update the user object in our list
                 user.setApprovalStatus(UserModel.STATUS_REJECTED);
                 userAdapter.updateUserStatus(position, UserModel.STATUS_REJECTED);
+
+                // Send rejection notification via FCM
+                NotificationService.sendRejectionNotificationToUser(user.getUserId(), user.getDisplayName(), reason);
+
+                // Send rejection email
+                EmailService emailService = new EmailService(this);
+                emailService.sendRejectionNotificationToUser(user.getEmail(), user.getDisplayName(), reason);
 
                 Toast.makeText(this, "User rejected", Toast.LENGTH_SHORT).show();
 
@@ -254,7 +289,6 @@ public class AdminDashboardActivity extends AppCompatActivity implements UserAda
             }
         });
     }
-
     @Override
     public void onRemoveClick(UserModel user, int position) {
         new AlertDialog.Builder(this)

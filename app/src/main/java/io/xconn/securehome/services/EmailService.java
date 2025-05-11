@@ -22,15 +22,17 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+
 /**
  * Service for sending emails via SMTP
  */
 public class EmailService {
     private static final String TAG = "EmailService";
 
-    // Email configuration
-    private static final String EMAIL_USERNAME = "securehomedemo@gmail.com"; // Replace with your actual email
-    private static final String EMAIL_PASSWORD = "your_app_password_here"; // Replace with your actual app password
+    // Email configuration - Move to secure storage or environment variables
+    // For development: use BuildConfig fields defined in build.gradle
+    private static final String EMAIL_USERNAME = "muteeb285@gmail.com";
+    private static final String EMAIL_PASSWORD = "kexi fbky edvc gkyz";
     private static final String EMAIL_HOST = "smtp.gmail.com";
     private static final String EMAIL_PORT = "465";
 
@@ -96,7 +98,7 @@ public class EmailService {
                 showToast("Email notification sent to administrator");
             } catch (MessagingException e) {
                 Log.e(TAG, "Failed to send registration request email", e);
-                showToast("Failed to send email notification");
+                showToast("Failed to send email notification: " + e.getMessage());
             }
         });
     }

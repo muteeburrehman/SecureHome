@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Initialize managers
         sessionManager = new SessionManager(this);
-        authManager = FirebaseAuthManager.getInstance();
+        authManager = FirebaseAuthManager.getInstance(this);
 
         // Setup network change receiver
         networkChangeReceiver = new NetworkChangeReceiver(this, this);

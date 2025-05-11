@@ -25,7 +25,7 @@ public class PendingApprovalActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pending_approval);
 
         sessionManager = new SessionManager(this);
-        authManager = FirebaseAuthManager.getInstance();
+        authManager = FirebaseAuthManager.getInstance(this);
 
         initializeViews();
         setupListeners();

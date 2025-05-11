@@ -1,5 +1,7 @@
 package io.xconn.securehome.api;
 
+import android.content.Context;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -9,20 +11,26 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import io.xconn.securehome.models.UserModel;
+import io.xconn.securehome.services.EmailService;
+import io.xconn.securehome.services.NotificationService;
 
 public class FirebaseAuthManager {
     private static FirebaseAuthManager instance;
     private FirebaseAuth mAuth;
     private FirebaseDatabaseManager dbManager;
+    private Context context; // Added context field
 
-    private FirebaseAuthManager() {
+    // Modified constructor to accept Context
+    private FirebaseAuthManager(Context context) {
+        this.context = context;
         mAuth = FirebaseAuth.getInstance();
         dbManager = FirebaseDatabaseManager.getInstance();
     }
 
-    public static synchronized FirebaseAuthManager getInstance() {
+    // Modified getInstance method to require Context
+    public static synchronized FirebaseAuthManager getInstance(Context context) {
         if (instance == null) {
-            instance = new FirebaseAuthManager();
+            instance = new FirebaseAuthManager(context);
         }
         return instance;
     }
@@ -76,6 +84,24 @@ public class FirebaseAuthManager {
 
                                         dbManager.saveUserToDatabase(userModel, dbTask -> {
                                             if (dbTask.isSuccessful()) {
+                                                // Send notifications if this is a regular user (pending approval)
+                                                if (!isAdmin) {
+                                                    // Send notification to admin via FCM
+                                                    NotificationService.sendRegistrationRequestToAdmin(
+                                                            displayName, email, user.getUid());
+
+                                                    // Find admin emails to send email notifications
+                                                    dbManager.getAdminEmails(adminEmails -> {
+                                                        if (adminEmails != null && !adminEmails.isEmpty()) {
+                                                            EmailService emailService = new EmailService(context); // Now context is defined
+                                                            for (String adminEmail : adminEmails) {
+                                                                emailService.sendRegistrationRequestToAdmin(
+                                                                        adminEmail, displayName, email);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+
                                                 if (callback != null) {
                                                     callback.onSuccess(userModel);
                                                 }

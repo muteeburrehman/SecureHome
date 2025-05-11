@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         initializeViews();
         setupListeners();
 
-        authManager = FirebaseAuthManager.getInstance();
+        authManager = FirebaseAuthManager.getInstance(this);
         sessionManager = new SessionManager(this);
 
         // Now check login status after views are initialized

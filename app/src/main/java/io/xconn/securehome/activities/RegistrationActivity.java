@@ -31,7 +31,8 @@ public class RegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
-        authManager = FirebaseAuthManager.getInstance();
+        // Updated: Pass the context to getInstance method
+        authManager = FirebaseAuthManager.getInstance(this);
         sessionManager = new SessionManager(this); // Initialize SessionManager
 
         initializeViews();

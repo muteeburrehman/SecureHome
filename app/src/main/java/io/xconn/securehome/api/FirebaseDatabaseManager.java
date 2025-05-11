@@ -1,5 +1,7 @@
 package io.xconn.securehome.api;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -9,7 +11,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.xconn.securehome.models.UserModel;
@@ -98,5 +102,35 @@ public class FirebaseDatabaseManager {
                 .document(userId)
                 .delete()
                 .addOnCompleteListener(listener);
+    }
+
+    public void getAdminEmails(AdminEmailsCallback callback) {
+        db.collection(USERS_COLLECTION)
+                .whereEqualTo("role", UserModel.ROLE_ADMIN)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<String> adminEmails = new ArrayList<>();
+                    for (DocumentSnapshot document : queryDocumentSnapshots) {
+                        UserModel admin = document.toObject(UserModel.class);
+                        if (admin != null && admin.getEmail() != null) {
+                            adminEmails.add(admin.getEmail());
+                        }
+                    }
+                    // Add the default admin email if it's not already in the list
+                    if (!adminEmails.contains(ADMIN_EMAIL)) {
+                        adminEmails.add(ADMIN_EMAIL);
+                    }
+                    callback.onEmailsRetrieved(adminEmails);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirebaseDatabaseManager", "Error getting admin emails", e);
+                    List<String> fallbackList = new ArrayList<>();
+                    fallbackList.add(ADMIN_EMAIL);
+                    callback.onEmailsRetrieved(fallbackList);
+                });
+    }
+
+    public interface AdminEmailsCallback {
+        void onEmailsRetrieved(List<String> adminEmails);
     }
 }
