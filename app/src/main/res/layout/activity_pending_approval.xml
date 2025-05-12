@@ -40,16 +40,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
             android:gravity="center"
-            android:text="Your account is pending approval from an administrator. You will be able to access the app once your account has been approved."
+            android:text="Your account is pending approval from an administrator. You will be automatically logged out."
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-
-        <Button
-            android:id="@+id/logout_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Log Out"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/colorPrimary" />
 
     </LinearLayout>
 

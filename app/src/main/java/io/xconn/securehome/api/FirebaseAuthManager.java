@@ -1,6 +1,7 @@
 package io.xconn.securehome.api;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -13,12 +14,16 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import io.xconn.securehome.models.UserModel;
 import io.xconn.securehome.services.EmailService;
 import io.xconn.securehome.services.NotificationService;
+import io.xconn.securehome.utils.SharedPreferencesManager;
 
 public class FirebaseAuthManager {
     private static FirebaseAuthManager instance;
     private FirebaseAuth mAuth;
     private FirebaseDatabaseManager dbManager;
     private Context context; // Added context field
+
+    private static final String TAG = "FirebaseAuthManager"; // Add a TAG for logging
+
 
     // Modified constructor to accept Context
     private FirebaseAuthManager(Context context) {
@@ -54,27 +59,26 @@ public class FirebaseAuthManager {
     }
 
     public void register(String email, String password, String displayName, OnCompleteListener<AuthResult> authListener, final AuthCallback callback) {
-        // Check if the email is the predefined admin email
         final boolean isAdmin = dbManager.isAdminEmail(email);
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
-                        // Set the user's display name
                         FirebaseUser user = task.getResult().getUser();
                         if (user != null) {
+                            final String finalUserId = user.getUid(); // Get UID for SharedPreferences
+
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(displayName)
                                     .build();
 
                             user.updateProfile(profileUpdates)
                                     .addOnCompleteListener(profileTask -> {
-                                        // Create user profile in Firestore after profile is updated
                                         String role = isAdmin ? UserModel.ROLE_ADMIN : UserModel.ROLE_USER;
                                         String status = isAdmin ? UserModel.STATUS_APPROVED : UserModel.STATUS_PENDING;
 
                                         UserModel userModel = new UserModel(
-                                                user.getUid(),
+                                                finalUserId, // Use finalUserId
                                                 email,
                                                 displayName,
                                                 role,
@@ -84,16 +88,19 @@ public class FirebaseAuthManager {
 
                                         dbManager.saveUserToDatabase(userModel, dbTask -> {
                                             if (dbTask.isSuccessful()) {
-                                                // Send notifications if this is a regular user (pending approval)
-                                                if (!isAdmin) {
-                                                    // Send notification to admin via FCM
-                                                    NotificationService.sendRegistrationRequestToAdmin(
-                                                            displayName, email, user.getUid());
+                                                // *** FIX 1: SAVE USER_ID and INITIALIZE NOTIFICATION SERVICE ***
+                                                SharedPreferencesManager.getInstance(context).saveString("user_id", finalUserId);
+                                                Log.d(TAG, "register: User ID saved to SharedPreferences: " + finalUserId);
+                                                NotificationService.initialize(context);
+                                                Log.d(TAG, "register: Called NotificationService.initialize()");
+                                                // *** END OF FIX 1 ***
 
-                                                    // Find admin emails to send email notifications
+                                                if (!isAdmin) {
+                                                    NotificationService.sendRegistrationRequestToAdmin(
+                                                            displayName, email, finalUserId); // Use finalUserId
                                                     dbManager.getAdminEmails(adminEmails -> {
                                                         if (adminEmails != null && !adminEmails.isEmpty()) {
-                                                            EmailService emailService = new EmailService(context); // Now context is defined
+                                                            EmailService emailService = new EmailService(context);
                                                             for (String adminEmail : adminEmails) {
                                                                 emailService.sendRegistrationRequestToAdmin(
                                                                         adminEmail, displayName, email);
@@ -112,14 +119,13 @@ public class FirebaseAuthManager {
                                                             new Exception("Failed to save user data"));
                                                 }
                                             }
-
-                                            // Make sure we invoke the external auth listener
                                             if (authListener != null) {
                                                 authListener.onComplete(task);
                                             }
                                         });
                                     });
                         } else {
+                            // ... (existing failure handling)
                             if (callback != null) {
                                 callback.onFailure(new Exception("User creation succeeded but user object is null"));
                             }
@@ -128,6 +134,7 @@ public class FirebaseAuthManager {
                             }
                         }
                     } else {
+                        // ... (existing failure handling)
                         if (callback != null) {
                             callback.onFailure(task.getException() != null ?
                                     task.getException() :
@@ -146,46 +153,62 @@ public class FirebaseAuthManager {
                     if (task.isSuccessful() && task.getResult() != null) {
                         FirebaseUser user = task.getResult().getUser();
                         if (user != null) {
-                            // Check user approval status in Firestore
-                            dbManager.getUserById(user.getUid(), userTask -> {
+                            final String finalUserId = user.getUid(); // Get UID for SharedPreferences
+
+                            dbManager.getUserById(finalUserId, userTask -> { // Use finalUserId
                                 if (userTask.isSuccessful() && userTask.getResult() != null && userTask.getResult().exists()) {
                                     DocumentSnapshot document = userTask.getResult();
                                     UserModel userModel = document.toObject(UserModel.class);
+
+                                    // *** FIX 2: SAVE USER_ID and INITIALIZE NOTIFICATION SERVICE (EXISTING USER) ***
+                                    SharedPreferencesManager.getInstance(context).saveString("user_id", finalUserId);
+                                    Log.d(TAG, "login: User ID saved to SharedPreferences (existing user): " + finalUserId);
+                                    NotificationService.initialize(context);
+                                    Log.d(TAG, "login: Called NotificationService.initialize() (existing user)");
+                                    // *** END OF FIX 2 ***
 
                                     if (callback != null) {
                                         callback.onSuccess(userModel);
                                     }
                                 } else {
-                                    // If no user document exists, create one (for migration purposes or first admin)
-                                    boolean isAdmin = dbManager.isAdminEmail(email);
+                                    // If no user document exists, create one
+                                    boolean isAdminLogin = dbManager.isAdminEmail(email);
                                     UserModel userModel = new UserModel(
-                                            user.getUid(),
+                                            finalUserId, // Use finalUserId
                                             email,
                                             user.getDisplayName() != null ? user.getDisplayName() : "User",
-                                            isAdmin ? UserModel.ROLE_ADMIN : UserModel.ROLE_USER,
-                                            isAdmin ? UserModel.STATUS_APPROVED : UserModel.STATUS_PENDING,
+                                            isAdminLogin ? UserModel.ROLE_ADMIN : UserModel.ROLE_USER,
+                                            isAdminLogin ? UserModel.STATUS_APPROVED : UserModel.STATUS_PENDING,
                                             System.currentTimeMillis()
                                     );
 
                                     dbManager.saveUserToDatabase(userModel, dbTask -> {
-                                        if (callback != null) {
-                                            if (dbTask.isSuccessful()) {
+                                        // *** FIX 3: SAVE USER_ID and INITIALIZE NOTIFICATION SERVICE (NEW USER DOC ON LOGIN) ***
+                                        if (dbTask.isSuccessful()) {
+                                            SharedPreferencesManager.getInstance(context).saveString("user_id", finalUserId);
+                                            Log.d(TAG, "login: User ID saved to SharedPreferences (new user doc on login): " + finalUserId);
+                                            NotificationService.initialize(context);
+                                            Log.d(TAG, "login: Called NotificationService.initialize() (new user doc on login)");
+
+                                            if (callback != null) {
                                                 callback.onSuccess(userModel);
-                                            } else {
+                                            }
+                                        } else {
+                                            if (callback != null) {
                                                 callback.onFailure(dbTask.getException() != null ?
                                                         dbTask.getException() :
                                                         new Exception("Failed to save user data"));
                                             }
                                         }
+                                        // *** END OF FIX 3 ***
                                     });
                                 }
-
-                                // Make sure we invoke the external auth listener
                                 if (authListener != null) {
                                     authListener.onComplete(task);
                                 }
                             });
                         } else {
+                            // ... (existing failure handling)
                             if (callback != null) {
                                 callback.onFailure(new Exception("Login succeeded but user object is null"));
                             }
@@ -194,6 +217,7 @@ public class FirebaseAuthManager {
                             }
                         }
                     } else {
+                        // ... (existing failure handling)
                         if (callback != null) {
                             callback.onFailure(task.getException() != null ?
                                     task.getException() :
@@ -205,9 +229,23 @@ public class FirebaseAuthManager {
                     }
                 });
     }
-
     public void logout() {
+        // *** FIX 4: CONSIDER CLEARING USER_ID FROM PREFERENCES ON LOGOUT ***
+        String userId = SharedPreferencesManager.getInstance(context).getString("user_id", null);
+        if (userId != null) {
+            Log.d(TAG, "logout: Clearing user_id: " + userId + " from SharedPreferences.");
+            SharedPreferencesManager.getInstance(context).remove("user_id");
+            // Optionally, also clear the FCM token from SharedPreferences if you stored it there directly,
+            // though NotificationService.initialize() would fetch a new one on next login.
+            // SharedPreferencesManager.getInstance(context).remove("fcm_token");
+        }
+        // You might also want to remove the token from the user's document in Firestore
+        // if (userId != null) {
+        //    NotificationService.updateToken(userId, null); // or an empty string
+        // }
+        // *** END OF FIX 4 ***
         mAuth.signOut();
+        Log.d(TAG, "User logged out.");
     }
 
     public void getCurrentUserModel(AuthCallback callback) {

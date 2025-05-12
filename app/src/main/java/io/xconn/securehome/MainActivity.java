@@ -1,13 +1,17 @@
 package io.xconn.securehome;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -30,12 +34,17 @@ import io.xconn.securehome.maincontroller.DashboardFragment;
 import io.xconn.securehome.maincontroller.Esp32CamFragment;
 import io.xconn.securehome.models.UserModel;
 import io.xconn.securehome.utils.NetworkChangeReceiver;
+import io.xconn.securehome.utils.NotificationPermissionManager;
 import io.xconn.securehome.utils.ServerCheckUtility;
 import io.xconn.securehome.utils.SessionManager;
+
+
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         NetworkChangeReceiver.NetworkChangeListener {
+
+    private NotificationPermissionManager notificationPermissionManager;
 
     private SessionManager sessionManager;
     private FirebaseAuthManager authManager;
@@ -51,6 +60,14 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize notification permission manager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationPermissionManager = new NotificationPermissionManager(this);
+        }
+        initNotificationPermissions();
+        // Request notification permissions
+        requestNotificationPermissions();
 
         // Initialize managers
         sessionManager = new SessionManager(this);
@@ -269,18 +286,18 @@ public class MainActivity extends AppCompatActivity implements
         redirectToLogin();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-
-        // Show/hide admin menu item based on role
-        MenuItem adminMenuItem = menu.findItem(R.id.menu_admin);
-        if (adminMenuItem != null) {
-            adminMenuItem.setVisible(sessionManager.isAdmin());
-        }
-
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.main_menu, menu);
+//
+//        // Show/hide admin menu item based on role
+//        MenuItem adminMenuItem = menu.findItem(R.id.menu_admin);
+//        if (adminMenuItem != null) {
+//            adminMenuItem.setVisible(sessionManager.isAdmin());
+//        }
+//
+//        return true;
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -304,18 +321,8 @@ public class MainActivity extends AppCompatActivity implements
 
         if (id == R.id.nav_profile) {
             startActivity(new Intent(this, EditProfileActivity.class));
-        } else if (id == R.id.nav_auto) {
-            // Handle auto on-off
-        } else if (id == R.id.nav_settings) {
-            // Navigate to settings
         } else if (id == R.id.nav_cp) {
             startActivity(new Intent(this, ChangePasswordActivity.class));
-        } else if (id == R.id.nav_faq) {
-            // Open FAQ
-        } else if (id == R.id.nav_reportbug) {
-            // Navigate to report issue
-        } else if (id == R.id.nav_pp) {
-            // Open privacy policy
         } else if (id == R.id.nav_logout) {
             logout();
         } else if (id == R.id.nav_server_config || id == R.id.action_server_config) {
@@ -357,4 +364,60 @@ public class MainActivity extends AppCompatActivity implements
             networkChangeReceiver.unregister();
         }
     }
+
+    private void requestNotificationPermissions() {
+        notificationPermissionManager.checkAndRequestNotificationPermission(
+                new NotificationPermissionManager.OnNotificationPermissionResultCallback() {
+                    @Override
+                    public void onPermissionGranted() {
+                        // Notification permission granted
+                        Log.d("MainActivity", "Notification permission granted");
+                        // You can set up notifications or update UI here
+                    }
+
+                    @Override
+                    public void onPermissionDenied() {
+                        // Notification permission denied
+                        runOnUiThread(() -> {
+                            showNotificationPermissionRationaleDialog();
+                        });
+                    }
+                }
+        );
+    }
+
+    private void showNotificationPermissionRationaleDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Notification Permissions")
+                .setMessage("Notifications are important for receiving real-time alerts from SecureHome. " +
+                        "Please enable notifications to stay informed about your home security.")
+                .setPositiveButton("Settings", (dialog, which) -> {
+                    // Open app settings so user can manually enable permissions
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                    intent.setData(uri);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+    // You can also add a method to check permission status elsewhere if needed
+    public boolean areNotificationsEnabled() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return notificationPermissionManager.isNotificationPermissionGranted();
+        }
+        return false;
+    }
+    private void initNotificationPermissions() {
+        // Moved notification permission request to a separate method
+        notificationPermissionManager = new NotificationPermissionManager(this);
+
+        // Only request permissions if needed
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestNotificationPermissions();
+        }
+    }
+
 }

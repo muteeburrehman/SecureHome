@@ -3,10 +3,13 @@ package io.xconn.securehome.services;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.FirebaseFunctionsException;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
@@ -56,10 +59,23 @@ public class NotificationService {
      * Update the user's FCM token in Firestore
      */
     private static void updateUserToken(Context context, String token) {
-        String userId = SharedPreferencesManager.getInstance(context).getString("user_id", null);
-        if (userId == null) return;
+        // First check Firebase Auth for current user
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            // User is logged in, update token with their UID
+            updateToken(currentUser.getUid(), token);
+            Log.d(TAG, "Token updated for user: " + currentUser.getUid() + " via Firebase Auth");
+            return;
+        }
 
-        updateToken(userId, token);
+        // Fallback to SharedPreferences if needed
+        String userId = SharedPreferencesManager.getInstance(context).getString("user_id", null);
+        if (userId != null) {
+            updateToken(userId, token);
+            Log.d(TAG, "Token updated for user: " + userId + " via SharedPreferences");
+        } else {
+            Log.w(TAG, "Could not update token: no user ID available");
+        }
     }
 
     /**
@@ -74,7 +90,7 @@ public class NotificationService {
 
         db.collection("users")
                 .document(userId)
-                .update(updates)
+                .set(updates, SetOptions.merge()) // Changed from update() to set() with merge
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "User FCM token updated successfully"))
                 .addOnFailureListener(e -> Log.e(TAG, "Error updating user FCM token", e));
     }
@@ -128,6 +144,7 @@ public class NotificationService {
             data.put("userId", userId);
             data.put("title", "Account Approved");
             data.put("body", "Your account has been approved. You can now use all features of the system.");
+            data.put("silent", false); // Add flag to indicate this is a required notification
 
             // Call the Cloud Function
             FirebaseFunctions.getInstance()
@@ -161,6 +178,7 @@ public class NotificationService {
             data.put("userId", userId);
             data.put("title", "Account Rejected");
             data.put("body", message);
+            data.put("silent", false); // Add flag to indicate this is a required notification
 
             // Call the Cloud Function
             FirebaseFunctions.getInstance()
@@ -173,5 +191,14 @@ public class NotificationService {
                         Log.e(TAG, "Failed to send rejection notification", e);
                     });
         });
+    }
+
+    /**
+     * Get the stored FCM token if available
+     * @param context Application context
+     * @return Current FCM token or null if not available
+     */
+    public static String getStoredToken(Context context) {
+        return SharedPreferencesManager.getInstance(context).getString(PREF_FCM_TOKEN, null);
     }
 }

@@ -2,8 +2,8 @@ package io.xconn.securehome.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,9 +15,9 @@ import io.xconn.securehome.utils.SessionManager;
 public class PendingApprovalActivity extends AppCompatActivity {
 
     private TextView messageText;
-    private Button logoutButton;
     private SessionManager sessionManager;
     private FirebaseAuthManager authManager;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,26 +26,35 @@ public class PendingApprovalActivity extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
         authManager = FirebaseAuthManager.getInstance(this);
+        handler = new Handler(Looper.getMainLooper());
 
         initializeViews();
-        setupListeners();
 
         String email = sessionManager.getUserEmail();
         messageText.setText("Your account (" + email + ") is pending approval from an administrator. " +
-                "You will be able to access the app once your account has been approved.");
+                "You will be automatically logged out.");
+
+        // Schedule automatic logout after 5 seconds
+        handler.postDelayed(this::performAutoLogout, 5000);
     }
 
     private void initializeViews() {
         messageText = findViewById(R.id.pending_message);
-        logoutButton = findViewById(R.id.logout_button);
     }
 
-    private void setupListeners() {
-        logoutButton.setOnClickListener(v -> {
-            authManager.logout();
-            sessionManager.clearSession();
-            startActivity(new Intent(PendingApprovalActivity.this, LoginActivity.class));
-            finish();
-        });
+    private void performAutoLogout() {
+        authManager.logout();
+        sessionManager.clearSession();
+        startActivity(new Intent(PendingApprovalActivity.this, LoginActivity.class));
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Remove any pending callbacks to prevent memory leaks
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
     }
 }

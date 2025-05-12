@@ -164,19 +164,8 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
 
         if (id == R.id.nav_profile) {
             // TODO: Navigate to profile
-        } else if (id == R.id.nav_auto) {
-            // TODO: Handle auto on-off
-        } else if (id == R.id.nav_settings) {
-            // TODO: Navigate to settings
-        } else if (id == R.id.nav_cp) {
-            // TODO: Navigate to change password
-        } else if (id == R.id.nav_faq) {
-            // TODO: Open FAQ
-        } else if (id == R.id.nav_reportbug) {
-            // TODO: Navigate to report issue
-        } else if (id == R.id.nav_pp) {
-            // TODO: Open privacy policy
-        } else if (id == R.id.nav_logout) {
+        }
+        else if (id == R.id.nav_logout) {
             logout();
         }
 

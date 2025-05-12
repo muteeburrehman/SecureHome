@@ -19,39 +19,39 @@
             android:orderInCategory="100"
             android:title="Server Configuration"
             app:showAsAction="never" />
-        <item
-            android:id="@+id/nav_auto"
-            android:icon="@mipmap/plugin"
-            android:title="Auto ON-OFF" />
-        <item
-            android:id="@+id/nav_settings"
-            android:icon="@mipmap/settings"
-            android:title="Settings" />
+<!--        <item-->
+<!--            android:id="@+id/nav_auto"-->
+<!--            android:icon="@mipmap/plugin"-->
+<!--            android:title="Auto ON-OFF" />-->
+<!--        <item-->
+<!--            android:id="@+id/nav_settings"-->
+<!--            android:icon="@mipmap/settings"-->
+<!--            android:title="Settings" />-->
         <item
             android:id="@+id/nav_cp"
             android:icon="@mipmap/changekey"
             android:title="Change Password" />
-        <item
-            android:id="@+id/nav_faq"
-            android:icon="@mipmap/faqss"
-            android:title="FAQ" />
-        <item
-            android:id="@+id/nav_reportbug"
-            android:icon="@mipmap/bugreport"
-            android:title="Report Issue" />
-        <item
-            android:id="@+id/nav_pp"
-            android:icon="@mipmap/privacypolicy"
-            android:title="Privacy Policy" />
+<!--        <item-->
+<!--            android:id="@+id/nav_faq"-->
+<!--            android:icon="@mipmap/faqss"-->
+<!--            android:title="FAQ" />-->
+<!--        <item-->
+<!--            android:id="@+id/nav_reportbug"-->
+<!--            android:icon="@mipmap/bugreport"-->
+<!--            android:title="Report Issue" />-->
+<!--        <item-->
+<!--            android:id="@+id/nav_pp"-->
+<!--            android:icon="@mipmap/privacypolicy"-->
+<!--            android:title="Privacy Policy" />-->
         <item
             android:id="@+id/nav_server_config"
             android:icon="@drawable/ic_settings"
             android:title="Server Configuration" />
-        <item
-            android:id="@+id/pl_switch_menu"
-            android:icon="@mipmap/smartphone"
-            android:title="Parental Control"
-            app:actionLayout="@layout/parental_control_switch_layout" />
+<!--        <item-->
+<!--            android:id="@+id/pl_switch_menu"-->
+<!--            android:icon="@mipmap/smartphone"-->
+<!--            android:title="Parental Control"-->
+<!--            app:actionLayout="@layout/parental_control_switch_layout" />-->
         <item
             android:id="@+id/nav_logout"
             android:icon="@mipmap/logout"
