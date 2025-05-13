@@ -7,16 +7,21 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.animation.AnimationUtils;
 
+import io.xconn.securehome.activities.AdminDashboardActivity;
 import io.xconn.securehome.activities.DeviceEnergyMonitoringActivity;
+import io.xconn.securehome.activities.EmergencyContactActivity;
+import io.xconn.securehome.activities.AlertsActivity;
+import io.xconn.securehome.api.FirebaseAuthManager;
+import io.xconn.securehome.models.UserModel;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 import io.xconn.securehome.R;
-import io.xconn.securehome.alerts.AlertsFragment;
 
 /**
  * Dashboard Fragment - Main control center for SecureHome application
@@ -27,10 +32,14 @@ public class DashboardFragment extends Fragment {
     private ImageView fgStatusImageView;
     private TextView homeFgStatusTextView;
     private TextView tempTextView, humidityTextView, aqiTextView;
+    private Button btnEmergency;
 
     // Cards for section control
     private MaterialCardView fgnCard, airmCard, alertCard, logoCard, electricityCard;
     private View rootView;
+
+    // Auth manager for user permission checks
+    private FirebaseAuthManager authManager;
 
     public DashboardFragment() {
         // Required empty public constructor
@@ -47,9 +56,13 @@ public class DashboardFragment extends Fragment {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
+        // Initialize Firebase Auth Manager
+        authManager = FirebaseAuthManager.getInstance(requireContext());
+
         // Initialize UI components and setup interactions
         initializeViews(rootView);
         setupCardListeners();
+        setupButtonListeners();
         loadInitialData();
         applyAnimations();
 
@@ -67,6 +80,9 @@ public class DashboardFragment extends Fragment {
         logoCard = view.findViewById(R.id.logoCard);
         electricityCard = view.findViewById(R.id.electricityCard);
 
+        // Buttons
+        btnEmergency = view.findViewById(R.id.btnEmergency);
+
         // Text and images
         fgStatusImageView = view.findViewById(R.id.fg_status);
         homeFgStatusTextView = view.findViewById(R.id.home_fg_status);
@@ -76,7 +92,7 @@ public class DashboardFragment extends Fragment {
     }
 
     /**
-     * Set up click listeners for all interactive elements
+     * Set up click listeners for all card elements
      */
     private void setupCardListeners() {
         fgnCard.setOnClickListener(v -> openFireGasDetailView());
@@ -87,12 +103,19 @@ public class DashboardFragment extends Fragment {
     }
 
     /**
+     * Set up click listeners for buttons
+     */
+    private void setupButtonListeners() {
+        btnEmergency.setOnClickListener(v -> openEmergencyContactView());
+    }
+
+    /**
      * Load initial data and set default text values
      */
     @SuppressLint("SetTextI18n")
     private void loadInitialData() {
         updateFireGasStatus(false);
-        tempTextView.setText("Security Alerts");
+        tempTextView.setText("Alerts");
         humidityTextView.setText("Access Control");
         aqiTextView.setText("Energy Analytics");
     }
@@ -144,28 +167,80 @@ public class DashboardFragment extends Fragment {
     }
 
     private void openAlertsView() {
-        showFeedback("Opening Security Alerts");
+        // Check if user is admin before allowing access to Alerts
+        if (authManager.isUserLoggedIn()) {
+            authManager.getCurrentUserModel(new FirebaseAuthManager.AuthCallback() {
+                @Override
+                public void onSuccess(UserModel userModel) {
+                    if (authManager.isAdmin(userModel)) {
+                        showFeedback("Opening Security Alerts");
 
-        // Create an instance of AlertsFragment
-        AlertsFragment alertsFragment = new AlertsFragment();
+                        // Navigate to AlertsActivity for admin users
+                        Intent intent = new Intent(getActivity(), AlertsActivity.class);
+                        startActivity(intent);
+                        if (getActivity() != null) {
+                            getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        }
+                    } else {
+                        // User is not an admin, show access denied message
+                        showFeedback("Access Denied: Admin permission required");
+                    }
+                }
 
-        // Replace the current fragment with AlertsFragment
-        requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, alertsFragment)  // R.id.fragment_container must be your container ID
-                .addToBackStack(null)  // Optional: allows user to go back
-                .commit();
+                @Override
+                public void onFailure(Exception e) {
+                    showFeedback("Error checking permissions. Please try again.");
+                }
+            });
+        } else {
+            showFeedback("Please login to access this feature");
+        }
     }
 
-
     private void openFacesRegisteredView() {
-        showFeedback("Opening Access Control");
-        // TODO: Implement navigation to Access Control view
+        // Check if user is admin before allowing access to Alerts
+        if (authManager.isUserLoggedIn()) {
+            authManager.getCurrentUserModel(new FirebaseAuthManager.AuthCallback() {
+                @Override
+                public void onSuccess(UserModel userModel) {
+                    if (authManager.isAdmin(userModel)) {
+                        showFeedback("Opening Access Control");
+
+                        // Navigate to AlertsActivity for admin users
+                        Intent intent = new Intent(getActivity(), AdminDashboardActivity.class);
+                        startActivity(intent);
+                        if (getActivity() != null) {
+                            getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        }
+                    } else {
+                        // User is not an admin, show access denied message
+                        showFeedback("Access Denied: Admin permission required");
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    showFeedback("Error checking permissions. Please try again.");
+                }
+            });
+        } else {
+            showFeedback("Please login to access this feature");
+        }
+
     }
 
     private void openEnergyAnalyticsView() {
         showFeedback("Opening Energy Analytics");
         Intent intent = new Intent(getActivity(), DeviceEnergyMonitoringActivity.class);
+        startActivity(intent);
+        if (getActivity() != null) {
+            getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        }
+    }
+
+    private void openEmergencyContactView() {
+        showFeedback("Opening Emergency Contact");
+        Intent intent = new Intent(getActivity(), EmergencyContactActivity.class);
         startActivity(intent);
         if (getActivity() != null) {
             getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

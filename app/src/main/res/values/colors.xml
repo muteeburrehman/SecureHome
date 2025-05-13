@@ -96,7 +96,7 @@
     <color name="background">#F8F9FF</color>
     <color name="surface">#FFFFFF</color>
     <color name="error">#FF4C60</color>
-
+    <color name="alert">#FF5252</color>
     <!-- Text colors -->
     <color name="text_primary">#1E1F4B</color>
     <color name="text_secondary">#6E7191</color>
