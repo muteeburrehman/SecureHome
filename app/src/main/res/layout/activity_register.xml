@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -20,106 +21,112 @@
                 android:id="@+id/tv_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="16dp"
                 android:gravity="center"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:background="@drawable/progress_text_background"/>
+                android:background="@drawable/progress_text_background"
+                android:text="No photo selected"/>
 
-            <!-- Selected Images RecyclerView -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_selected_images"
+            <!-- Main Upload Placeholder -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/upload_placeholder"
+                android:layout_width="match_parent"
+                android:layout_height="280dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@color/primaryColor">
+
+                    <ImageView
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_gravity="center"
+                        app:srcCompat="@drawable/logo"
+                        android:layout_marginBottom="16dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tap to take a photo"
+                        android:textSize="20sp"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Or use gallery button below"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/white"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Gallery Button -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/gallery_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:rippleColor="@color/secondaryColor"
+                android:backgroundTint="@color/secondaryColor">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginEnd="16dp"
+                        app:srcCompat="@drawable/ic_baseline_image_24"
+                        app:tint="@android:color/white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Select from Gallery"
+                        android:textSize="18sp"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Selected Photo Preview - Initially GONE -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/selected_photo_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/recycler_background"
-                android:padding="8dp"/>
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:visibility="gone">
 
-            <!-- Buttons Section -->
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:columnCount="2"
-                android:rowCount="1"
-                android:layout_gravity="center"
-                android:orientation="horizontal">
-
-                <!-- Gallery Button -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_selected_images"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="16dp">
+                    android:padding="8dp"/>
+            </androidx.cardview.widget.CardView>
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_gallery"
-                        style="@style/Widget.MaterialComponents.CardView"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        app:cardCornerRadius="60dp"
-                        android:elevation="12dp"
-                        android:layout_gravity="center"
-                        android:backgroundTint="@color/primaryColor">
-
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_gravity="center"
-                            app:srcCompat="@drawable/ic_baseline_image_24"
-                            app:tint="@android:color/white" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Choose from Gallery"
-                        android:textSize="16sp"
-                        android:textColor="@color/white"
-                        android:gravity="center"/>
-                </LinearLayout>
-
-                <!-- Camera Button -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="16dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_camera"
-                        style="@style/Widget.MaterialComponents.CardView"
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        app:cardCornerRadius="60dp"
-                        android:elevation="12dp"
-                        android:layout_gravity="center"
-                        android:backgroundTint="@color/secondaryColor">
-
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_gravity="center"
-                            app:srcCompat="@drawable/ic_baseline_camera_24"
-                            app:tint="@android:color/white" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Take a Photo"
-                        android:textSize="16sp"
-                        android:textColor="@color/white"
-                        android:gravity="center"/>
-                </LinearLayout>
-            </GridLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -138,6 +145,6 @@
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/primaryColor"
-        android:text="Upload Photos"
+        android:text="Upload Photo"
         app:icon="@drawable/ic_upload"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

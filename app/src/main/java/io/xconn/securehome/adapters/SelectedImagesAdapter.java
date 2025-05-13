@@ -37,7 +37,7 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
         // Configure Glide options once for reuse
         this.glideOptions = new RequestOptions()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .centerCrop()
+                .fitCenter()  // Changed from centerCrop to fitCenter
                 .placeholder(R.drawable.baseline_image_24) // Add a placeholder drawable
                 .error(R.drawable.remove); // Add an error drawable
     }
@@ -118,11 +118,7 @@ public class SelectedImagesAdapter extends RecyclerView.Adapter<SelectedImagesAd
             imageView = itemView.findViewById(R.id.selected_image);
             removeButton = itemView.findViewById(R.id.btn_remove_image);
 
-            // Pre-set layout parameters for better performance
-            itemView.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
+            // We'll let the ConstraintLayout handle layout parameters
         }
     }
 }
