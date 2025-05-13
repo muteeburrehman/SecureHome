@@ -192,10 +192,11 @@ public class MainActivity extends AppCompatActivity implements
             } else if (item.getItemId() == R.id.nav_activities) {
                 selectedFragment = new ActivitiesFragment();
                 title = "ACTIVITIES";
-            } else if (item.getItemId() == R.id.nav_alerts) {
-                selectedFragment = new Esp32CamFragment();
-                title = "Esp32CAM";
             }
+//            else if (item.getItemId() == R.id.nav_alerts) {
+//                selectedFragment = new Esp32CamFragment();
+//                title = "Esp32CAM";
+//            }
 
             if (selectedFragment != null) {
                 switchFragment(selectedFragment, title);

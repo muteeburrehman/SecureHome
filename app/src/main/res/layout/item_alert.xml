@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/alertCardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/strokecol"
+    app:cardBackgroundColor="@color/backgroundColor">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Alert Icon -->
+        <ImageView
+            android:id="@+id/alertIconImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            tools:src="@drawable/ic_notification"
+            android:contentDescription="Alert Icon" />
+
+        <!-- Alert Content -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+
+            <!-- Alert Type and Time -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/alertTypeTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="Security Alert"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/mazzardlbolditalic"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/alertTimeTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="2 hours ago"
+                    android:textColor="@color/textColor"
+                    android:textSize="12sp"
+                    android:alpha="0.7" />
+            </LinearLayout>
+
+            <!-- Alert Title -->
+            <TextView
+                android:id="@+id/alertTitleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Motion Detected at Front Door"
+                android:textColor="@color/textColor"
+                android:textSize="16sp"
+                android:fontFamily="@font/mazzardlbolditalic"
+                android:layout_marginTop="4dp" />
+
+            <!-- Alert Description -->
+            <TextView
+                android:id="@+id/alertDescriptionTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Camera detected motion at the front door entrance. Check video recording for details."
+                android:textColor="@color/textColor"
+                android:textSize="14sp"
+                android:alpha="0.8"
+                android:layout_marginTop="4dp" />
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/detailsButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="View Details"
+                    android:textColor="@color/colorAccent"
+                    android:textAllCaps="false"
+                    android:minHeight="36dp"
+                    android:paddingVertical="2dp"
+                    android:paddingHorizontal="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/dismissButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dismiss"
+                    android:textColor="@color/textColor"
+                    android:textAllCaps="false"
+                    android:minHeight="36dp"
+                    android:paddingVertical="2dp"
+                    android:paddingHorizontal="12dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Unread Indicator -->
+        <View
+            android:id="@+id/unreadIndicator"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/circle_shape"
+            android:layout_gravity="top|end" />
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

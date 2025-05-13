@@ -100,10 +100,11 @@ public class BottomNavBarActivity extends AppCompatActivity implements Navigatio
             } else if (item.getItemId() == R.id.nav_activities) {
                 selectedFragment = activitiesFragment;
                 title = "ACTIVITIES";
-            } else if (item.getItemId() == R.id.nav_alerts) {
-                selectedFragment = esp32CamFragment;
-                title = "ESP CAM";
             }
+//            } else if (item.getItemId() == R.id.nav_alerts) {
+//                selectedFragment = esp32CamFragment;
+//                title = "ESP CAM";
+//            }
 
             if (selectedFragment != null && selectedFragment != activeFragment) {
                 fragmentManager.beginTransaction()
